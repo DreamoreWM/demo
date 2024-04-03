@@ -224,58 +224,6 @@ class AppointmentForm extends Component
         return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
     }
 
-
-//    public function bookSlot()
-//    {
-//        $userId = auth()->id(); // Assurez-vous que l'utilisateur est authentifié.
-//        $user = User::find($userId);
-//
-//        // Supposons que getAvailableSlots renvoie une collection de slots disponibles sans tenir compte des prestations.
-//        $availableSlots = $this->getAvailableSlots(null, $this->selectedEmployeeId);
-//
-//        foreach ($this->selectedPrestations as $selectedPrestation) {
-//            $duration = $selectedPrestation->temps; // Durée de la prestation actuelle en minutes.
-//            $slotsNeeded = ceil($duration / 60); // Calculez le nombre de slots nécessaires, en supposant que chaque slot représente une heure.
-//
-//            $slotsBooked = 0; // Compteur pour les slots réservés pour cette prestation.
-//
-//            foreach ($availableSlots as $date => $slotsOnDate) {
-//                foreach ($slotsOnDate as $slotGroup) {
-//                    foreach ($slotGroup as $slot) {
-//                        if ($slotsBooked >= $slotsNeeded) {
-//                            break 3; // Si nous avons réservé assez de slots pour la prestation, passez à la prochaine prestation.
-//                        }
-//
-//                        // Créez l'Appointment en associant le slot et l'utilisateur.
-//                        $appointment = new Appointment();
-//                        $appointment->bookable_id = $user->id;
-//                        $appointment->bookable_type = get_class($user);
-//                        $appointment->slot_id = $this->selectedItemIds; // Assurez-vous que $slot est l'instance correcte.
-//                        $this->selectedItemIds++;
-//                        $appointment->save();
-//
-//
-//
-//                        $slot = Slot::find($slot['id']);
-//                        $slot->prestation_id = $selectedPrestation->id;
-//                        $slot->save();
-//
-//                        $slotsBooked++; // Incrémentez le compteur de slots réservés.
-//                    }
-//                }
-//            }
-//
-//            if ($slotsBooked < $slotsNeeded) {
-//                // Gérer le cas où il n'y a pas assez de slots disponibles pour la prestation actuelle.
-//                return redirect('/dashboard')->with('error', "Pas assez de créneaux disponibles pour les prestations sélectionnées.");
-//            }
-//        }
-//
-
-//        // Rediriger vers l'accueil avec un message de succès
-//        return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
-//    }
-
     private function addEventToGoogleCalendar($user, $slot)
     {
         $client = new Google_Client();
