@@ -1,0 +1,83 @@
+@extends('layouts.app')
+
+@section('header')
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        Gestion des Créneaux pour l'employé : {{ $employee->name }}
+    </h2>
+@endsection
+
+@section('content')
+    <div class="container py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @php
+                // Date du premier jour du mois
+                $firstDayOfMonth = now()->startOfMonth();
+                // Nombre de semaines dans le mois
+                $weeksInMonth = $firstDayOfMonth->copy()->endOfMonth()->weekOfYear - $firstDayOfMonth->weekOfYear + 1;
+            @endphp
+            @for($week = 1; $week <= $weeksInMonth; $week++)
+                @php
+                    // Obtenir le premier jour de la semaine
+                    $firstDayOfWeek = $firstDayOfMonth->copy()->addWeeks($week - 1)->startOfWeek();
+                @endphp
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="card bg-white overflow-hidden shadow-sm sm:rounded-lg mb-4">
+                            <div class="card-body">
+                                <form method="POST" action="{{ route('employees.slots.update', $employee) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="8" class="text-center">Semaine {{ $week }}</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Heure / Jour</th>
+                                            @for ($i = 0; $i < 7; $i++)
+                                                @php
+                                                    $currentDay = $firstDayOfWeek->copy()->addDays($i);
+                                                @endphp
+                                                <th>{{ $currentDay->format('l j F') }}</th>
+                                            @endfor
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @for($hour = 8; $hour < 17; $hour++) {{-- Créneaux de 8h à 16h --}}
+                                        <tr>
+                                            <td>{{ $hour }}h - {{ $hour + 1 }}h</td>
+                                            @for ($i = 0; $i < 7; $i++)
+                                                @php
+                                                    $currentDay = $firstDayOfWeek->copy()->addDays($i);
+                                                    $dayOfWeek = strtolower($currentDay->format('l'));
+                                                    $slot = $employee->slots()->where('day_of_week', $dayOfWeek)
+                                       ->where('date', $currentDay->format('Y-m-d'))
+                                       ->where('start_time', sprintf('%02d:00:00', $hour))
+                                       ->first();
+            $checked = $slot ? true : false;
+                                                    $checkboxId = "slot-{$dayOfWeek}-{$currentDay->format('Y-m-d')}-{$hour}";
+                                                @endphp
+                                                <td>
+                                                    <input type="checkbox" id="{{ $checkboxId }}" name="slots[{{ $dayOfWeek }}][{{ $currentDay->format('Y-m-d') }}][]" value="{{ $hour }}" {{ $checked ? 'checked' : '' }}>
+                                                </td>
+                                            @endfor
+                                        </tr>
+                                        @endfor
+                                        </tbody>
+                                    </table>
+                                    <div class="text-center">
+                                        <input type="checkbox" id="selectAllWeek{{ $week }}">
+                                        <label for="selectAllWeek{{ $week }}">Sélectionner toute la semaine</label>
+                                        <button class="btn btn-primary">Enregistrer les Créneaux</button>
+                                        <button class="btn btn-warning" onclick="window.location='{{ route('employees.index') }}'">Retour</button>
+                                    </div>
+                                    <hr>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endfor
+        </div>
+    </div>
+@endsection
