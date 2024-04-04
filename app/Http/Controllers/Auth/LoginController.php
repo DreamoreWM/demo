@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\TemporaryUser;
 use App\Models\User;
 use Exception;
 use Google_Client;
