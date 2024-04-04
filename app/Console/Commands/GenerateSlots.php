@@ -24,10 +24,10 @@ class GenerateSlots extends Command
 
         foreach ($employees as $employee) {
             for ($date = now(); $date->lte($endDate); $date->addDay()) {
-                $dayOfWeekName = strtolower($date->englishDayOfWeek); // Obtenir le nom du jour
+                $dayOfWeekName = strtolower($date->englishDayOfWeek);
 
                 $openDays = json_decode($settings->open_days, true);
-                if (!isset($openDays[$dayOfWeekName])) continue; // Continuer si le jour n'est pas configuré
+                if (!isset($openDays[$dayOfWeekName])) continue;
 
                 $daySettings = $openDays[$dayOfWeekName];
                 $employeeSchedule = $employee->schedules()->where('day_of_week', $date->dayOfWeekIso)->first();
@@ -47,14 +47,12 @@ class GenerateSlots extends Command
                         $nextStartTime = (clone $startTime)->addMinutes($settings->slot_duration);
                         if ($nextStartTime->gt($endTime)) break; // Ne pas créer de créneau si cela dépasse l'heure de fin
 
-                        Slot::create([
+                        Slot::firstOrCreate([
                             'employee_id' => $employee->id,
                             'date' => $date->toDateString(),
                             'day_of_week' => $date->dayOfWeekIso, // Utiliser dayOfWeekIso pour la cohérence
                             'start_time' => $startTime->format('H:i:s'),
                             'end_time' => $nextStartTime->format('H:i:s'),
-                            'created_at' => now(),
-                            'updated_at' => now(),
                         ]);
 
                         $startTime = $nextStartTime;
