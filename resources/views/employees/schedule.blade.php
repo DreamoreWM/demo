@@ -1,18 +1,24 @@
 <form action="{{ route('employees.schedule.store', $employee->id) }}" method="POST">
     @csrf
 
-    <select name="day_of_week">
-        <option value="1">Lundi</option>
-        <option value="2">Mardi</option>
-        <option value="3">Mercredi</option>
-        <option value="4">Jeudi</option>
-        <option value="5">Vendredi</option>
-        <option value="6">Samedi</option>
-        <option value="7">Dimanche</option>
-    </select>
+    @foreach (range(1, 7) as $dayOfWeek)
+        @php
+            $schedule = $schedules->firstWhere('day_of_week', $dayOfWeek);
+            $start_time = $schedule ? (new DateTime($schedule->start_time))->format('H:i') : '';
+            $end_time = $schedule ? (new DateTime($schedule->end_time))->format('H:i') : '';
+        @endphp
+        <div>
+            <label for="start_time_{{ $dayOfWeek }}">Jour {{ $dayOfWeek }} Heure de Début:</label>
+            <input type="time" id="start_time_{{ $dayOfWeek }}" name="schedules[{{ $dayOfWeek }}][start_time]" value="{{ $start_time }}">
+            <input type="hidden" name="schedules[{{ $dayOfWeek }}][day_of_week]" value="{{ $dayOfWeek }}">
 
-    <input type="time" name="start_time" placeholder="Heure de Début">
-    <input type="time" name="end_time" placeholder="Heure de Fin">
+            <label for="end_time_{{ $dayOfWeek }}">Heure de Fin:</label>
+            <input type="time" id="end_time_{{ $dayOfWeek }}" name="schedules[{{ $dayOfWeek }}][end_time]" value="{{ $end_time }}">
+            @if ($schedule)
+                <input type="hidden" name="schedules[{{ $dayOfWeek }}][id]" value="{{ $schedule->id }}">
+            @endif
+        </div>
+    @endforeach
 
     <button type="submit">Ajouter l'Horaire</button>
 </form>
