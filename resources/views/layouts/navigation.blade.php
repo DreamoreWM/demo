@@ -23,6 +23,12 @@
                         <x-nav-link :href="route('prestations.create')" :active="request()->routeIs('prestations.*')">
                             {{ __('Prestations') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('prestations.*')">
+                            {{ __('Calendrier') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('appointments.create')" :active="request()->routeIs('prestations.*')">
+                            {{ __('Prendre rendez-vous') }}
+                        </x-nav-link>
                     @endif
                     <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
                         @if(!Auth::check())

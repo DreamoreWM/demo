@@ -16,7 +16,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">Prénom du Coiffeur</label>
-                        <input type="text" class="form-control" id="prenom" name="prenom" required>
+                        <input type="text" class="form-control" id="surname" name="surname" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email du Coiffeur</label>

@@ -29,7 +29,7 @@ class EmployeeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
             // Utilisez la règle 'email' pour valider le champ email
             'email' => 'required|string|email|max:255|unique:employees,email',
         ]);
