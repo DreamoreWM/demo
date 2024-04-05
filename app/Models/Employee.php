@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     use hasFactory;
-    protected $fillable = ['name','prenom','email'];
+    protected $fillable = ['name','surname','email'];
 
     public function slots()
     {

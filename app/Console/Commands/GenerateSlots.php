@@ -63,8 +63,4 @@ class GenerateSlots extends Command
 
         $this->info('Slots generated successfully for the next month.');
     }
-
-
-
-
 }

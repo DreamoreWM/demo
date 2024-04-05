@@ -65,7 +65,7 @@
                                     <td class="px-4 py-3">{{ $employee->email }}</td>
                                     <td class="px-4 py-3 flex items-center justify-end">
                                         <button wire:click="delete({{$employee->id}})" class="px-3 py-1 bg-red-500 text-white rounded">X</button>
-                                        <button onclick="window.location='{{ route('employees.slots.index', ['employee' => $employee->id]) }}'" class="px-3 py-1 bg-yellow-500 text-white rounded">Horraires</button>
+                                        <button onclick="window.location='{{ route('employees.schedule.edit', ['employee' => $employee->id]) }}'" class="px-3 py-1 bg-yellow-500 text-white rounded">Horraires</button>
                                     </td>
                                 </tr>
                             @endforeach
