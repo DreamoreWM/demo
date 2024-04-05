@@ -283,20 +283,25 @@ class AppointmentForm extends Component
 
     public function deletePrestation($index)
     {
-        unset($this->selectedPrestations[$index]);
-        $this->selectedPrestations = array_values($this->selectedPrestations); // Réindexe le tableau
-
-        // Recalculez les créneaux disponibles ici
-        $this->recalculateAvailableSlots();
+        if (isset($this->selectedPrestations[$index])) {
+            unset($this->selectedPrestations[$index]);
+            $this->selectedPrestations = array_values($this->selectedPrestations); // Réindexe le tableau
+            $this->recalculateAvailableSlots();
+        }
     }
 
     public function recalculateAvailableSlots()
     {
-        $totalDuration = array_sum(array_map(function($prestation) {
-            return $prestation->temps; // 'temps' est en minutes
-        }, $this->selectedPrestations));
+        if (count($this->selectedPrestations) > 0) {
+            $totalDuration = array_sum(array_map(function($prestation) {
+                return $prestation->temps; // 'temps' est en minutes
+            }, $this->selectedPrestations));
 
-        // Mettez à jour $this->slots en fonction des prestations restantes
-        $this->slots = $this->getAvailableSlots($this->selectedPrestations[0]->id, $this->selectedEmployeeId, $totalDuration);
+            // Mettez à jour $this->slots en fonction des prestations restantes
+            $this->slots = $this->getAvailableSlots($this->selectedPrestations[0]->id, $this->selectedEmployeeId, $totalDuration);
+        } else {
+            // Réinitialisez $this->slots si aucune prestation n'est sélectionnée
+            $this->selectedPrestation = null;
+        }
     }
 }
