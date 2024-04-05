@@ -23,7 +23,7 @@ class AppointmentForm extends Component
     public $slots;
     public $prestations; // Ajout de la variable $prestations
     public $selectedItemIds;
-    public $confirmingItemDeletion = false;
+    public $confirmingItem = false;
     public $selectedEmployeeId;
     public $currentWeekStartDate;
     public $currentWeekEndDate;
@@ -46,13 +46,11 @@ class AppointmentForm extends Component
     }
 
 
-    public function confirmItemDeletion($itemIds)
+    public function confirmItem($itemIds)
     {
         $this->selectedItemIds = $itemIds;
-        $this->confirmingItemDeletion = true;
+        $this->confirmingItem = true;
     }
-
-
 
 
     public function render()
