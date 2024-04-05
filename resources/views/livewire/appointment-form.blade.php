@@ -232,7 +232,7 @@
                                                                     $firstOfGroupDisplayed = true;
                                                                 @endphp
                                                                 <div>
-                        <span wire:click="confirmItem({{ $slot->id }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                        <span wire:click="confirmItem({{ $sequence[0]['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
                             {{ \Carbon\Carbon::parse($sequence[0]['start_time'])->format('H:i') }}
                         </span>
                                                                 </div>
@@ -344,7 +344,7 @@
                                                                         @endphp
                                                                         @if($dateR == $formattedDay)
                                                                             <div>
-                                        <span wire:click="confirmItem({{ $slot->id }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                                        <span wire:click="confirmItem({{ $firstSlotOfGroup['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
                                             {{ \Carbon\Carbon::parse($firstSlotOfGroup['start_time'])->format('H:i') }}
                                         </span>
                                                                             </div>
