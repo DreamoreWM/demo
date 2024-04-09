@@ -23,20 +23,18 @@ class AppointmentForm extends Component
     public $slots;
     public $prestations; // Ajout de la variable $prestations
     public $selectedItemIds;
-    public $confirmingItemDeletion = false;
+    public $confirmingItem = false;
     public $selectedEmployeeId;
     public $currentWeekStartDate;
     public $currentWeekEndDate;
-
     public $showAddPrestationDiv = false;
 
     public function mount()
     {
         $this->selectedPrestation = null;
-        $this->slots = [];
-        $this->prestations = Prestation::all(); // Récupération de toutes les prestations
+        $this->availableSlots = [];
+        $this->prestations = Prestation::all();
         $this->currentWeekStartDate = now()->startOfWeek();
-        // Utilisez endOfMonth() pour le calcul initial de la fin, mais la logique de boucle ajustera cela pour chaque semaine
         $this->endOfMonthDate = now()->endOfMonth();
     }
 
@@ -45,15 +43,11 @@ class AppointmentForm extends Component
         $this->showAddPrestationDiv = !$this->showAddPrestationDiv;
     }
 
-
-    public function confirmItemDeletion($itemIds)
+    public function confirmItem($itemIds)
     {
         $this->selectedItemIds = $itemIds;
-        $this->confirmingItemDeletion = true;
+        $this->confirmingItem = true;
     }
-
-
-
 
     public function render()
     {
@@ -64,23 +58,18 @@ class AppointmentForm extends Component
     public function updatedSelectedEmployeeId($value)
     {
         $this->selectedEmployeeId = $value;
-        $this->slots = $this->getAvailableSlots($this->selectedPrestation->id, $value);
+        $this->availableSlots = $this->getAvailableSlots($this->selectedPrestation->id, $value);
     }
-
-
 
     public function selectPrestation($prestationId)
     {
-        // Trouver la prestation sélectionnée et la stocker dans $selectedPrestation
         $this->selectedPrestation = Prestation::findOrFail($prestationId);
-
-        // Ajouter la prestation sélectionnée au tableau des prestations sélectionnées
-        // Vérifier d'abord si la prestation n'est pas déjà dans le tableau pour éviter les doublons
-        if (!in_array($this->selectedPrestation, $this->selectedPrestations)) {
+            $this->selectedPrestations[] = $this->selectedPrestation;
             $this->selectedPrestations[] = $this->selectedPrestation;
         }
+        $this->selectedPrestations[] = $this->selectedPrestation;
+        }
 
-        // Sélectionner automatiquement le premier employé de la liste
         $firstEmployee = Employee::first();
         if ($firstEmployee) {
             $this->selectedEmployeeId = $firstEmployee->id;
@@ -88,76 +77,50 @@ class AppointmentForm extends Component
             $this->selectedEmployeeId = null;
         }
 
-        // Charger les créneaux pour cet employé
-        // Note: Vous pourriez vouloir ajuster cette logique pour prendre en compte toutes les prestations sélectionnées
-        $this->slots = $this->getAvailableSlots($prestationId, $this->selectedEmployeeId);
+        $this->availableSlots = $this->getAvailableSlots($prestationId, $this->selectedEmployeeId);
         $this->showAddPrestationDiv = false;
     }
 
-
     private function getAvailableSlots($prestationId, $employeeId = null)
     {
-        // Récupérer la durée de la prestation
         $totalDuration = array_sum(array_map(function($prestation) {
             return $prestation->temps; // Assurez-vous que 'temps' est en minutes
         }, $this->selectedPrestations));
 
+        $availableSlots = [];
+        $openDays = json_decode(setting('salon_settings.open_days'), true);
+        $employeeSchedule = Employee::where('id', $employeeId)->first()->schedule;
 
-        // Filtrer les créneaux par employé, si un ID est fourni
-        $creneauxDisponibles = Slot::when($employeeId, function ($query) use ($employeeId) {
-            return $query->where('employee_id', $employeeId);
-        })->orderBy('date')->orderBy('start_time')->get();
+        for ($date = $this->currentWeekStartDate; $date <= $this->endOfMonthDate; $date->addDay()) {
+            $dayOfWeek = $date->format('l');
+            if (isset($openDays[$dayOfWeek]) && $employeeSchedule[$dayOfWeek]['open'] != null) {
+                $openTime = new DateTime($openDays[$dayOfWeek]['open']);
+                $closeTime = new DateTime($openDays[$dayOfWeek]['close']);
+                $breakStartTime = new DateTime($openDays[$dayOfWeek]['break_start']);
+                $breakEndTime = new DateTime($openDays[$dayOfWeek]['break_end']);
 
-        // Filtrer pour obtenir des créneaux consécutifs
-        $creneauxConsecutifs = $this->filterConsecutiveSlots($creneauxDisponibles, $totalDuration, $employeeId);
+                while ($openTime < $closeTime) {
+                    if ($openTime >= $breakStartTime && $openTime < $breakEndTime) {
+                        $openTime->modify('+1 hour'); // Sauter la pause déjeuner
+                        continue;
+                    }
 
-        return collect($creneauxConsecutifs)->groupBy('date');
-    }
-
-
-
-    private function filterConsecutiveSlots($creneauxDisponibles, $dureePrestation, $employeeId)
-    {
-        $totalSlotsNeeded = ceil($dureePrestation / 60); // Nombre total de créneaux nécessaires
-        $creneauxConsecutifs = [];
-
-        // Convertissez d'abord la collection en tableau
-        $creneauxArray = $creneauxDisponibles->toArray();
-
-        for ($i = 0; $i < count($creneauxArray); $i++) {
-            $sequenceConsecutive = collect();
-            foreach (array_slice($creneauxArray, $i) as $creneau) {
-                if ($creneau['employee_id'] != $employeeId || \App\Models\Appointment::where('slot_id', $creneau['id'])->exists()) {
-                    break; // S'il ne s'agit pas du bon employé ou si le créneau est déjà réservé, arrêtez cette séquence
+                    $endTime = clone $openTime;
+                    $endTime->modify("+{$totalDuration} minutes");
+                    if ($endTime <= $closeTime) {
+                        $availableSlots[] = [
+                            'date' => $date->format('Y-m-d'),
+                            'start_time' => $openTime->format('H:i:s'),
+                            'end_time' => $endTime->format('H:i:s'),
+                            'employee_id' => $employeeId,
+                        ];
+                    }
+                    $openTime->modify('+1 hour');
                 }
-
-                if (!$sequenceConsecutive->isEmpty() && $creneau['start_time'] != $sequenceConsecutive->last()['end_time']) {
-                    break; // Si le créneau n'est pas consécutif à la séquence, arrêtez cette séquence
-                }
-
-                $sequenceConsecutive->push($creneau);
-                if ($sequenceConsecutive->count() == $totalSlotsNeeded) {
-                    $creneauxConsecutifs[] = $sequenceConsecutive->toArray();
-                    break; // Trouvé un ensemble satisfaisant, continuez à chercher d'autres ensembles
-                }
-
-
             }
         }
 
-        return $creneauxConsecutifs;
-    }
-
-
-    public function updatedSelectedEmployee($employeeId)
-    {
-
-        $usedSlotIds = Appointment::pluck('slot_id')->toArray(); // Récupère tous les slotId de la table appointments
-
-        // Récupérer les slots de l'employé sélectionné qui ne sont pas pris
-        $this->slots = Slot::where('employee_id', $employeeId)
-            ->whereNotIn('id', $usedSlotIds) // Exclut les slots déjà pris
-            ->get();
+        return $availableSlots;
     }
 
     public function bookSlot() {
@@ -225,7 +188,7 @@ class AppointmentForm extends Component
     }
 
     private function addEventToGoogleCalendar($user, $slot)
-    {
+    {   
         $client = new Google_Client();
         // Configurez le client Google avec vos clés API
         $client->setClientId(env('GOOGLE_CLIENT_ID'));
@@ -256,11 +219,11 @@ class AppointmentForm extends Component
 
         $newDate = $slot->date; // Format Y-m-d
 
-// Combinez la nouvelle date avec les heures extraites
+      // Combinez la nouvelle date avec les heures extraites
         $startDateTime = $newDate . ' ' . $startHour;
         $endDateTime = $newDate . ' ' . $endHour;
 
-// Conversion en format RFC3339 pour l'API Google Calendar
+         // Conversion en format RFC3339 pour l'API Google Calendar
         $startDateTimeRFC3339 = (new DateTime($startDateTime))->format(DateTime::RFC3339);
         $endDateTimeRFC3339 = (new DateTime($endDateTime))->format(DateTime::RFC3339);
 
@@ -285,7 +248,7 @@ class AppointmentForm extends Component
     {
         if (isset($this->selectedPrestations[$index])) {
             unset($this->selectedPrestations[$index]);
-            $this->selectedPrestations = array_values($this->selectedPrestations); // Réindexe le tableau
+            $this->selectedPrestations = array_values($this->selectedPrestations);
             $this->recalculateAvailableSlots();
         }
     }
@@ -297,11 +260,10 @@ class AppointmentForm extends Component
                 return $prestation->temps; // 'temps' est en minutes
             }, $this->selectedPrestations));
 
-            // Mettez à jour $this->slots en fonction des prestations restantes
-            $this->slots = $this->getAvailableSlots($this->selectedPrestations[0]->id, $this->selectedEmployeeId, $totalDuration);
+            $this->availableSlots = $this->getAvailableSlots($this->selectedPrestations[0]->id, $this->selectedEmployeeId);
         } else {
-            // Réinitialisez $this->slots si aucune prestation n'est sélectionnée
             $this->selectedPrestation = null;
+            $this->availableSlots = [];
         }
     }
 }
