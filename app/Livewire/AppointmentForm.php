@@ -22,8 +22,8 @@ class AppointmentForm extends Component
 
     public $slots;
     public $prestations; // Ajout de la variable $prestations
-    public $selectedItemIds;
-    public $confirmingItemDeletion = false;
+    public $selectedItemId;
+    public $confirmingItem = false;
     public $selectedEmployeeId;
     public $currentWeekStartDate;
     public $currentWeekEndDate;
@@ -46,13 +46,11 @@ class AppointmentForm extends Component
     }
 
 
-    public function confirmItemDeletion($itemIds)
+    public function confirmItem($itemId)
     {
-        $this->selectedItemIds = $itemIds;
-        $this->confirmingItemDeletion = true;
+        $this->selectedItemId = $itemId;
+        $this->confirmingItem = true;
     }
-
-
 
 
     public function render()
@@ -183,8 +181,8 @@ class AppointmentForm extends Component
                             $appointment = new Appointment();
                         $appointment->bookable_id = $user->id;
                         $appointment->bookable_type = get_class($user);
-                        $appointment->slot_id = $this->selectedItemIds; // Assurez-vous que $slot est l'instance correcte.
-                        $this->selectedItemIds++;
+                        $appointment->slot_id = $this->selectedItemId; // Assurez-vous que $slot est l'instance correcte.
+                        $this->selectedItemId++;
                         $appointment->save();
 
 

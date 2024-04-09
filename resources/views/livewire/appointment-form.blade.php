@@ -232,7 +232,7 @@
                                                                     $firstOfGroupDisplayed = true;
                                                                 @endphp
                                                                 <div>
-                        <span wire:click="confirmItemDeletion({{ $sequence[0]['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                        <span wire:click="confirmItem({{ $sequence[0]['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
                             {{ \Carbon\Carbon::parse($sequence[0]['start_time'])->format('H:i') }}
                         </span>
                                                                 </div>
@@ -344,7 +344,7 @@
                                                                         @endphp
                                                                         @if($dateR == $formattedDay)
                                                                             <div>
-                                        <span wire:click="confirmItemDeletion({{ $firstSlotOfGroup['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                                        <span wire:click="confirmItem({{ $firstSlotOfGroup['id'] }})" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
                                             {{ \Carbon\Carbon::parse($firstSlotOfGroup['start_time'])->format('H:i') }}
                                         </span>
                                                                             </div>
@@ -379,7 +379,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 
-        <div class="modal fade {{ $confirmingItemDeletion ? 'show' : '' }}" style="display: {{ $confirmingItemDeletion ? 'block' : 'none' }};" tabindex="-1" role="dialog">
+        <div class="modal fade {{ $confirmingItem ? 'show' : '' }}" style="display: {{ $confirmingItem ? 'block' : 'none' }};" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -392,7 +392,7 @@
                         Êtes-vous sûr de vouloir effectuer cette action ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" wire:click="$set('confirmingItemDeletion', false)">Annuler</button>
+                        <button type="button" class="btn btn-secondary" wire:click="$set('confirmingItem', false)">Annuler</button>
                         <button type="button" class="btn btn-primary" wire:click="bookSlot">Confirmer</button>
                     </div>
                 </div>
