@@ -35,9 +35,7 @@ class AppointmentForm extends Component
         $this->selectedPrestation = null;
         $this->slots = [];
         $this->prestations = Prestation::all(); // Récupération de toutes les prestations
-        $this->currentWeekStartDate = now()->startOfWeek();
-        // Utilisez endOfMonth() pour le calcul initial de la fin, mais la logique de boucle ajustera cela pour chaque semaine
-        $this->endOfMonthDate = now()->endOfMonth();
+        $this->currentWeekStartDate = now()->startOfWeek();$this->endOfMonthDate = now()->endOfMonth();
     }
 
     public function toggleAddPrestationDiv()
