@@ -32,9 +32,9 @@ class AppointmentForm extends Component
     public function mount()
     {
         $this->selectedPrestation = null;
-        $this->availableSlots = [];
-        $this->prestations = Prestation::all();
-        $this->currentWeekStartDate = now()->startOfWeek();
+        $this->slots = [];
+        $this->prestations = Prestation::all(); // Récupération de toutes les prestations
+        $this->currentWeekStartDate = now()->startOfWeek();$this->endOfMonthDate = now()->endOfMonth();
         $this->endOfMonthDate = now()->endOfMonth();
     }
 
