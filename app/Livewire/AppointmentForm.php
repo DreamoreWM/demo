@@ -42,7 +42,7 @@ class AppointmentForm extends Component
     {
         $this->showAddPrestationDiv = !$this->showAddPrestationDiv;
     }
-  
+
     public function confirmItem($itemIds)
     {
         $this->selectedItemIds = $itemIds;
