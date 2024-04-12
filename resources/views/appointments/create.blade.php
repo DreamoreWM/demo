@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <livewire:appointment-form />
+    <livewire:reservation-component/>
 @endsection
 
 @section('scripts')

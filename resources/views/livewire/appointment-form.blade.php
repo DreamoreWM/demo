@@ -85,7 +85,7 @@
                     @if(!$selectedPrestation)
                         <h1><span style="color: dodgerblue">1.</span> Choix de la prestation</h1>
                     @else
-                        <h1><span style="color: dodgerblue">1.</span> Prestation sélectionnée</h1>
+                        <h1><span style="   color: dodgerblue">1.</span> Prestation sélectionnée</h1>
                     @endif
                 </div>
             </div>
