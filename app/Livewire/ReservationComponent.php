@@ -56,40 +56,54 @@ class ReservationComponent extends Component
             $endDate = now()->addMonth();
 
             while ($startDate->lte($endDate)) {
-                $dayOfWeek = strtolower($startDate->format('l')); // 1 (lundi) à 7 (dimanche)
+                $dayOfWeek = $startDate->format('w'); // 0 (dimanche) à 6 (samedi)
 
-                // Vérifier si le jour est ouvert
-                if (isset($this->openDays[$dayOfWeek])) {
-                    $openHours = $this->openDays[$dayOfWeek];
-                    $startTime = strtotime($openHours['open']);
-                    $endTime = strtotime($openHours['close']);
-                    $breakStart = strtotime($openHours['break_start']);
-                    $breakEnd = strtotime($openHours['break_end']);
+                // Vérifier si le jour est ouvert pour l'employé
+                foreach ($employeeSchedules as $schedule) {
+                    if ($schedule->day_of_week == $dayOfWeek) {
+                        $openHours = $this->openDays[strtolower($startDate->format('l'))];
+                        $scheduleStart = strtotime($schedule->start_time);
+                        $scheduleEnd = strtotime($schedule->end_time);
+                        $scheduleBreakStart = strtotime($schedule->break_start);
+                        $scheduleBreakEnd = strtotime($schedule->break_end);
+                        $shopBreakStart = strtotime($openHours['break_start']);
+                        $shopBreakEnd = strtotime($openHours['break_end']);
 
-                    $currentTime = $startTime;
-
-                    while ($currentTime + $totalDuration * 60 <= $endTime) {
-                        // Vérifier si le créneau n'est pas pendant la pause
-                        if ($currentTime + $totalDuration * 60 <= $breakStart || $currentTime >= $breakEnd) {
-                            $slotStart = date('H:i', $currentTime);
-                            $slotEnd = date('H:i', $currentTime + $totalDuration * 60); // Durée totale des prestations
-                            $this->availableSlots[] = [
-                                'start' => $slotStart,
-                                'end' => $slotEnd,
-                                'date' => $startDate->format('Y-m-d'),
-                            ];
+                        $currentTime = max($scheduleStart, strtotime($openHours['open']));
+                        while ($currentTime + $totalDuration * 60 <= min($scheduleEnd, strtotime($openHours['close']))) {
+                            // Vérifier si le créneau n'est pas pendant la pause de l'employé
+                            if ($currentTime + $totalDuration * 60 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
+                                // Vérifier si le créneau n'est pas pendant la pause du salon
+                                if ($currentTime + $totalDuration * 60 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
+                                    $slotStart = date('H:i', $currentTime);
+                                    $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
+                                    $this->availableSlots[] = [
+                                        'start' => $slotStart,
+                                        'end' => $slotEnd,
+                                        'date' => $startDate->format('Y-m-d'),
+                                    ];
+                                }
+                            }
+                            $currentTime += 3600; // Passer au créneau suivant (1 heure)
                         }
-
-                        $currentTime += 3600; // Passer au créneau suivant (1 heure)
                     }
                 }
 
-                // Passer au jour suivant
-                $startDate->addDay();
+                $startDate->addDay(); // Passer au jour suivant
             }
         }
     }
+    public function deletePrestation($index)
+    {
+        unset($this->selectedPrestations[$index]);
+        $this->selectedPrestations = array_values($this->selectedPrestations);
+        $this->getAvailableSlots();
+    }
 
+    public function toggleAddPrestationDiv()
+    {
+        $this->showAddPrestationDiv = !$this->showAddPrestationDiv;
+    }
     public function book()
     {
         // Logique pour enregistrer la réservation

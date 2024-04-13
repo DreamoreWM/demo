@@ -78,47 +78,70 @@
     <div class="content">
         <div class="overlay"></div>
         <div class="content-inner">
-            <h1>Réservation</h1>
-
-            <div>
-                <label for="prestation">Choisissez une ou plusieurs prestations :</label>
-                <div class="row">
-                    @foreach ($prestations as $prestation)
-                        <div class="col-auto">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectedPrestations" value="{{ $prestation->id }}" id="prestation-{{ $prestation->id }}">
-                                <label class="form-check-label" for="prestation-{{ $prestation->id }}">
-                                    {{ $prestation->nom }} ({{ $prestation->temps }} min - {{ $prestation->prix }} €)
-                                </label>
-                            </div>
-                        </div>
-                    @endforeach
+            <!-- Affichage des prestations -->
+            <div class="m-3 mx-auto max-w-screen-lg px-4 lg:px-12" style="font-size: 30px">
+                <div class="inline-block">
+                    @if(count($selectedPrestations) !== 0)
+                        <h1><span style="color: dodgerblue">1.</span> Choix de la prestation</h1>
+                    @else
+                        <h1><span style="color: dodgerblue">1.</span> Prestation sélectionnée</h1>
+                    @endif
                 </div>
             </div>
 
-            <div class="mt-4">
-                <label for="employee">Choisissez un employé :</label>
-                <div class="row">
-                    @foreach ($employees as $employee)
-                        <div class="col-auto">
-                            <div class="card">
-                                <div class="card-body d-flex align-items-center">
-                                    <label class="form-check-label rounded-circle text-center" for="employee-{{ $employee->id }}" style="width: 35px; height: 35px; line-height: 35px; background: #000; color: #fff;">
-                                        {{ strtoupper(substr($employee->name, 0, 1)) }}
-                                    </label>
-                                    <h5 class="card-title ml-2 mr-20 ">{{ $employee->name }}</h5>
-                                    <div class="form-check form-check-inline" style="margin-right: -10px;">
-                                        <input class="form-check-input" type="radio" wire:model.live="selectedEmployee" value="{{ $employee->id }}" id="employee-{{ $employee->id }}">
+            <section class="mt-2">
+                <div class="mx-auto max-w-screen-lg px-4 lg:px-12">
+                    <div class="mb-4 d-flex justify-content-center bg-white rounded-lg shadow">
+                        <div class="col">
+                            @if(count($selectedPrestations) === 0 || $showAddPrestationDiv)
+                                <div class="col">
+                                    @foreach ($prestations as $prestation)
+                                        <div class="col-auto">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" wire:model.live="selectedPrestations" value="{{ $prestation->id }}" id="prestation-{{ $prestation->id }}">
+                                                <label class="form-check-label" for="prestation-{{ $prestation->id }}">
+                                                    {{ $prestation->nom }} ({{ $prestation->temps }} min - {{ $prestation->prix }} €)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            @if(count($selectedPrestations) !== 0 || $showAddPrestationDiv)
+
+                                <div class="card-body justify-content-between border-none ml-10 mr-20 mb-2">
+                                    <div class="mb-2">
+                                        <h1>Avec qui?</h1>
+                                    </div>
+                                    <div class="row d-flex justify-center m-3">
+                                        @foreach ($employees as $employee)
+                                            <div class="col-auto">
+                                                <div class="card">
+                                                    <div class="card-body d-flex align-items-center">
+                                                        <label class="form-check-label rounded-circle text-center" for="employee-{{ $employee->id }}" style="width: 35px; height: 35px; line-height: 35px; background: #000; color: #fff;">
+                                                            {{ strtoupper(substr($employee->name, 0, 1)) }}
+                                                        </label>
+                                                        <h5 class="card-title ml-2 mr-20 ">{{ $employee->name }}</h5>
+                                                        <div class="form-check form-check-inline" style="margin-right: -10px;">
+                                                            <input class="form-check-input" type="radio" wire:model.live="selectedEmployee" value="{{ $employee->id }}" id="employee-{{ $employee->id }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
+                                @if(count($selectedPrestations) !== 0)
+                                    <button wire:click="toggleAddPrestationDiv" class="btn btn-secondary">Ajouter une prestation</button>
+                                @endif
+                            @endif
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-            </div>
+            </section>
 
-
-            @if($selectedPrestations && $selectedEmployee)
+            @if(count($selectedPrestations) !== 0 && $selectedEmployee)
                 <div class="laptop">
                     <div class="mx-auto max-w-screen-lg px-4 lg:px-12" style="font-size: 30px">
                         <div class="inline-block">
@@ -137,7 +160,6 @@
                                     $currentWeekStart = $startOfMonth->copy();
                                     $oneMonthLater = $currentWeekStart->copy()->addMonth();
                                 @endphp
-                                    <!-- Affichage hebdomadaire -->
                                 @while($currentWeekStart->lt($oneMonthLater))
                                     @php
                                         $currentWeekEnd = $currentWeekStart->copy()->addDays(6);
@@ -157,9 +179,9 @@
                                                         @foreach($availableSlots as $slot)
                                                             @if($slot['date'] == $formattedDay)
                                                                 <div>
-                                                    <span class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
-                                                        {{ $slot['start'] }}
-                                                    </span>
+                                                                <span class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                                                                    {{ $slot['start'] }}
+                                                                </span>
                                                                 </div>
                                                             @endif
                                                         @endforeach
@@ -170,7 +192,6 @@
                                         </div>
                                     </swiper-slide>
                                     @php
-                                        // Préparer le début de la semaine suivante
                                         $currentWeekStart = $currentWeekEnd->copy()->addDay();
                                     @endphp
                                 @endwhile
@@ -183,7 +204,6 @@
                 </div>
             @endif
         </div>
-
     </div>
 
 </div>
