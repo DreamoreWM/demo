@@ -13,9 +13,10 @@ class ReservationComponent extends Component
     public $prestations;
     public $employees;
     public $openDays;
-    public $selectedPrestation;
+    public $selectedPrestations = [];
     public $selectedEmployee;
     public $availableSlots = [];
+    public $showAddPrestationDiv = false;
 
     public function mount()
     {
@@ -25,7 +26,7 @@ class ReservationComponent extends Component
         $this->openDays = json_decode($this->setting->open_days, true);
     }
 
-    public function updatedSelectedPrestation()
+    public function updatedSelectedPrestations()
     {
         $this->getAvailableSlots();
     }
@@ -37,12 +38,18 @@ class ReservationComponent extends Component
 
     public function getAvailableSlots()
     {
-        if ($this->selectedPrestation && $this->selectedEmployee) {
-            $prestation = Prestation::find($this->selectedPrestation);
+        if ($this->selectedPrestations && $this->selectedEmployee) {
             $employee = Employee::find($this->selectedEmployee);
             $employeeSchedules = EmployeeSchedule::where('employee_id', $employee->id)->get();
 
             $this->availableSlots = [];
+
+            // Calculer la durée totale des prestations sélectionnées
+            $totalDuration = 0;
+            foreach ($this->selectedPrestations as $prestationId) {
+                $prestation = Prestation::find($prestationId);
+                $totalDuration += $prestation->temps;
+            }
 
             // Déterminer la date de début (aujourd'hui) et la date de fin (dans un mois)
             $startDate = now();
@@ -61,12 +68,11 @@ class ReservationComponent extends Component
 
                     $currentTime = $startTime;
 
-                    while ($currentTime < $endTime) {
-                        $slotStart = date('H:i', $currentTime);
-                        $slotEnd = date('H:i', $currentTime + 3600); // Ajout d'une heure
-
+                    while ($currentTime + $totalDuration * 60 <= $endTime) {
                         // Vérifier si le créneau n'est pas pendant la pause
-                        if ($currentTime < $breakStart || $currentTime >= $breakEnd) {
+                        if ($currentTime + $totalDuration * 60 <= $breakStart || $currentTime >= $breakEnd) {
+                            $slotStart = date('H:i', $currentTime);
+                            $slotEnd = date('H:i', $currentTime + $totalDuration * 60); // Durée totale des prestations
                             $this->availableSlots[] = [
                                 'start' => $slotStart,
                                 'end' => $slotEnd,
