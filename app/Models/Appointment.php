@@ -9,7 +9,7 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['slot_id', 'user_id'];
+    protected $fillable = ['employee_id', 'start_time', 'end_time', 'bookable_id', 'bookable_type'];
 
     public function slot()
     {
@@ -25,6 +25,11 @@ class Appointment extends Model
     public function bookable()
     {
         return $this->morphTo();
+    }
+
+    public function prestations()
+    {
+        return $this->belongsToMany(Prestation::class, 'appointment_prestation');
     }
 
 }

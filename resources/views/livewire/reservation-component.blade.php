@@ -81,7 +81,7 @@
             <!-- Affichage des prestations -->
             <div class="m-3 mx-auto max-w-screen-lg px-4 lg:px-12" style="font-size: 30px">
                 <div class="inline-block">
-                    @if(count($selectedPrestations) !== 0)
+                    @if(count($selectedPrestations) === 0)
                         <h1><span style="color: dodgerblue">1.</span> Choix de la prestation</h1>
                     @else
                         <h1><span style="color: dodgerblue">1.</span> Prestation sélectionnée</h1>
@@ -94,21 +94,54 @@
                     <div class="mb-4 d-flex justify-content-center bg-white rounded-lg shadow">
                         <div class="col">
                             @if(count($selectedPrestations) === 0 || $showAddPrestationDiv)
-                                <div class="col">
-                                    @foreach ($prestations as $prestation)
-                                        <div class="col-auto">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" wire:model.live="selectedPrestations" value="{{ $prestation->id }}" id="prestation-{{ $prestation->id }}">
-                                                <label class="form-check-label" for="prestation-{{ $prestation->id }}">
-                                                    {{ $prestation->nom }} ({{ $prestation->temps }} min - {{ $prestation->prix }} €)
-                                                </label>
+                                @foreach ($prestations as $prestation)
+                                    @if (!in_array($prestation->id, $selectedPrestations))
+                                        <div class="card m-3">
+                                            <div class="card-body d-flex justify-content-between">
+                                                <h5 class="card-title">{{ $prestation->nom }}</h5>
+                                                <div class="d-flex" style="color: gray">
+                                                    <p>{{ $prestation->temps }} min</p>
+                                                    <p class="ml-2 mr-2"> • </p>
+                                                    <p style="font-weight: bold;">{{ $prestation->prix }} €</p>
+                                                    <button wire:click="togglePrestation({{ $prestation->id }})" class="btn btn-primary ml-5">Sélectionner</button>
+                                                </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    @endif
+                                @endforeach
                             @endif
 
+
+
+
+
+
+
+
+
+
+
+
+
                             @if(count($selectedPrestations) !== 0 || $showAddPrestationDiv)
+
+                                    @if(count($selectedPrestations) !== 0)
+                                        <div class="mb-4 d-flex justify-content-center">
+                                            <div class="col">
+                                                @foreach ($this->getSelectedPrestations() as $index => $prestation)
+                                                    <div class="card-body d-flex justify-content-between border-none ml-10 mr-20 mt-8 mb-2">
+                                                        <div class="font-bold">
+                                                            <p>{{ $prestation['name'] }}</p>
+                                                            <p class="text-gray-400">{{ $prestation['temps'] }} min<span class="ml-2 mr-2"> • </span> {{ $prestation['prix'] }} €</p>
+                                                        </div>
+                                                        <div>
+                                                            <button wire:click="deletePrestation({{ $index }})" class="text-red-500">Supprimer</button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
 
                                 <div class="card-body justify-content-between border-none ml-10 mr-20 mb-2">
                                     <div class="mb-2">
@@ -179,7 +212,7 @@
                                                         @foreach($availableSlots as $slot)
                                                             @if($slot['date'] == $formattedDay)
                                                                 <div>
-                                                                <span class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
+                                                                <span  wire:click="confirmReservation('{{ $slot['date'] }}', '{{ $slot['start'] }}')" class="badge bg-gray-200 mb-2" style="font-weight: normal; color: black; font-size:14px; padding: 13px 40px; border-radius: 10px;">
                                                                     {{ $slot['start'] }}
                                                                 </span>
                                                                 </div>
