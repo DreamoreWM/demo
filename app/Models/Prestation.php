@@ -23,4 +23,9 @@ class Prestation extends Model
     {
         return $this->hasMany(Slot::class);
     }
+
+    public function appointments()
+    {
+        return $this->belongsToMany(Appointment::class, 'appointment_prestation');
+    }
 }

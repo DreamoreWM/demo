@@ -37,9 +37,9 @@
                     <label class="form-label">{{ ucfirst($day) }}</label>
                     <div>
                         <input type="time" name="open_days[{{ $day }}][open]" value="{{ old('open_days.'.$day.'.open', $openDays[$day]['open'] ?? '') }}" placeholder="{{ ucfirst($day) }} Heure d'Ouverture">
-                        <input type="time" name="open_days[{{ $day }}][close]" value="{{ old('open_days.'.$day.'.close', $openDays[$day]['close'] ?? '') }}" placeholder="{{ ucfirst($day) }} Heure de Fermeture">
                         <input type="time" name="open_days[{{ $day }}][break_start]" value="{{ old('open_days.'.$day.'.break_start', $openDays[$day]['break_start'] ?? '') }}" placeholder="{{ ucfirst($day) }} Début de la Pause">
                         <input type="time" name="open_days[{{ $day }}][break_end]" value="{{ old('open_days.'.$day.'.break_end', $openDays[$day]['break_end'] ?? '') }}" placeholder="{{ ucfirst($day) }} Fin de la Pause">
+                        <input type="time" name="open_days[{{ $day }}][close]" value="{{ old('open_days.'.$day.'.close', $openDays[$day]['close'] ?? '') }}" placeholder="{{ ucfirst($day) }} Heure de Fermeture">
 
                     </div>
                 </div>
