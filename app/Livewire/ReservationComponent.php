@@ -255,7 +255,7 @@ class ReservationComponent extends Component
                                     }
                                 }
                             }
-                            $currentTime += 3600; // Passer au créneau suivant (15 minutes)
+                            $currentTime += 3600;
                         }
                     }
                 }
