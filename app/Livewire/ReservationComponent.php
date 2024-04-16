@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\EmployeeSchedule;
 use App\Models\SalonSetting;
 use App\Models\User;
+use Carbon\Carbon;
 use DateInterval;
 use DateTime;
 use Livewire\Component;
@@ -44,39 +45,81 @@ class ReservationComponent extends Component
         $endDatetime = clone $startDatetime;
         $endDatetime->add(new DateInterval('PT' . $totalDuration . 'M'));
 
-        // Mettre à jour le tableau $selectedSlot avec l'heure de fin
-        $this->selectedSlot = [
-            'date' => $date,
-            'start' => $start,
-            'end' => $endDatetime->format('H:i') // Formater l'heure de fin dans le format HH:MM
+        // Vérifier si le créneau est disponible
+        if ($this->isSlotAvailable($startDatetime, $endDatetime)) {
+            // Mettre à jour le tableau $selectedSlot avec l'heure de fin
+            $this->selectedSlot = [
+                'date' => $date,
+                'start' => $start,
+                'end' => $endDatetime->format('H:i') // Formater l'heure de fin dans le format HH:MM
+            ];
+
+            $userId = auth()->id(); // Assurez-vous que l'utilisateur est authentifié.
+            $user = User::find($userId);
+
+            // Créer la nouvelle réservation
+            $appointment = Appointment::create([
+                'employee_id' => $this->selectedEmployee,
+                'start_time' => $this->selectedSlot['date'] . ' ' . $this->selectedSlot['start'],
+                'end_time' => $this->selectedSlot['date'] . ' ' . $this->selectedSlot['end'],
+                'bookable_id' => $user->id,
+                'bookable_type' => get_class($user),
+            ]);
+
+            // Lier les prestations à la réservation
+            foreach ($this->selectedPrestations as $prestationId) {
+                $appointment->prestations()->attach($prestationId);
+            }
+
+            // Réinitialiser les données
+            $this->selectedPrestations = [];
+            $this->selectedEmployee = null;
+            $this->selectedSlot = null;
+            $this->availableSlots = [];
+
+            \Mail::to($user->email)->send(new \App\Mail\ReservationConfirmed($user, $appointment));
+
+            return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
+        } else {
+            // Le créneau n'est pas disponible, masquer le badge
+            $this->availableSlots = $this->getAvailableSlots();
+            return view('reservation.index', [
+                'selectedPrestations' => $this->selectedPrestations,
+                'selectedEmployee' => $this->selectedEmployee,
+                'selectedSlot' => $this->selectedSlot,
+                'availableSlots' => $this->availableSlots,
+            ]);
+        }
+    }
+
+
+
+    private function isSlotAvailable($startDatetime, $endDatetime)
+    {
+        $requestedSlot = [
+            'start' => Carbon::parse($startDatetime),
+            'end' => Carbon::parse($endDatetime),
         ];
 
-        $userId = auth()->id(); // Assurez-vous que l'utilisateur est authentifié.
-        $user = User::find($userId);
+        $existingAppointments = Appointment::all();
 
-        // Créer la nouvelle réservation
-        $appointment = Appointment::create([
-            'employee_id' => $this->selectedEmployee,
-            'start_time' => $this->selectedSlot['date'] . ' ' . $this->selectedSlot['start'],
-            'end_time' => $this->selectedSlot['date'] . ' ' . $this->selectedSlot['end'],
-            'bookable_id' => $user->id,
-            'bookable_type' => get_class($user),
-        ]);
+        foreach ($existingAppointments as $appointment) {
+            $existingSlot = [
+                'start' => Carbon::parse($appointment->start_time),
+                'end' => Carbon::parse($appointment->end_time),
+            ];
 
-        // Lier les prestations à la réservation
-        foreach ($this->selectedPrestations as $prestationId) {
-            $appointment->prestations()->attach($prestationId);
+            if ($this->doSlotsOverlap($requestedSlot, $existingSlot)) {
+                return false;
+            }
         }
 
-        // Réinitialiser les données
-        $this->selectedPrestations = [];
-        $this->selectedEmployee = null;
-        $this->selectedSlot = null;
-        $this->availableSlots = [];
+        return true;
+    }
 
-        \Mail::to($user->email)->send(new \App\Mail\ReservationConfirmed($user, $appointment));
-
-        return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
+    private function doSlotsOverlap($slot1, $slot2)
+    {
+        return $slot1['start']->lte($slot2['end']) && $slot1['end']->gte($slot2['start']);
     }
 
 
@@ -118,7 +161,7 @@ class ReservationComponent extends Component
             $startDate = now();
             $endDate = now()->addMonth();
 
-            while ($startDate->lte($endDate)) {
+            while ($startDate <= $endDate) {
                 $dayOfWeek = $startDate->format('w'); // 0 (dimanche) à 6 (samedi)
 
                 // Vérifier si le jour est ouvert pour l'employé
@@ -138,16 +181,23 @@ class ReservationComponent extends Component
                             if ($currentTime + $totalDuration * 60 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                                 // Vérifier si le créneau n'est pas pendant la pause du salon
                                 if ($currentTime + $totalDuration * 60 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
-                                    $slotStart = date('H:i', $currentTime);
-                                    $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
-                                    $this->availableSlots[] = [
-                                        'start' => $slotStart,
-                                        'end' => $slotEnd,
-                                        'date' => $startDate->format('Y-m-d'),
-                                    ];
+                                    $startDatetime = new DateTime($startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime));
+                                    $endDatetime = clone $startDatetime;
+                                    $endDatetime->add(new DateInterval('PT' . $totalDuration . 'M'));
+
+                                    // Vérifier si le créneau est disponible
+                                    if ($this->isSlotAvailable($startDatetime, $endDatetime)) {
+                                        $slotStart = date('H:i', $currentTime);
+                                        $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
+                                        $this->availableSlots[] = [
+                                            'start' => $slotStart,
+                                            'end' => $slotEnd,
+                                            'date' => $startDate->format('Y-m-d'),
+                                        ];
+                                    }
                                 }
                             }
-                            $currentTime += 3600; // Passer au créneau suivant (1 heure)
+                            $currentTime += 3600; // Passer au créneau suivant (15 minutes)
                         }
                     }
                 }
