@@ -22,76 +22,33 @@ class CalendarController extends Controller
         $setting = SalonSetting::first();
         $openDays = json_decode($setting->open_days, true);
 
-        $events = $this->generateCalendarEvents($appointments, $employees);
-        $availableSlots = $this->getAvailableSlots($openDays, $employees);
-        $availableEvents = $this->generateAvailableEvents($availableSlots, $employees);
+        $events = $this->generateCalendarEvents($appointments, $employees, $openDays);
 
         return view('calendar', [
-            'events' => array_merge($events, $availableEvents),
+            'events' => $events,
             'employees' => $employees,
             'prestations' => $prestations,
         ]);
     }
 
-    private function generateCalendarEvents($appointments, $employees)
+    private function generateCalendarEvents($appointments, $employees, $openDays)
     {
         $events = [];
+        $appointmentSlots = [];
 
+        // Récupérer les créneaux des rendez-vous
         foreach ($appointments as $appointment) {
             $start = Carbon::parse($appointment->start_time);
             $end = Carbon::parse($appointment->end_time);
 
-            $employee = $employees->find($appointment->employee_id);
-            $employeeData = $employee ? [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'color' => $employee->color,
-            ] : null;
-
-            $events[] = [
-                'id' => $appointment->id,
-                'title' => $appointment->prestations->pluck('nom')->implode(', '),
-                'start' => $start->toDateTimeString(),
-                'end' => $end->toDateTimeString(),
-                'color' => 'red',
-                'employee' => $employeeData,
+            $appointmentSlots[] = [
+                'start' => $start->format('Y-m-d H:i'),
+                'end' => $end->format('Y-m-d H:i'),
+                'employee_id' => $appointment->employee_id,
             ];
         }
 
-        return $events;
-    }
-
-    private function generateAvailableEvents($availableSlots, $employees)
-    {
-        $events = [];
-
-        foreach ($availableSlots as $slot) {
-            $start = Carbon::createFromFormat('Y-m-d H:i', $slot['date'] . ' ' . $slot['start']);
-            $end = Carbon::createFromFormat('Y-m-d H:i', $slot['date'] . ' ' . $slot['end']);
-
-            $employee = $employees->find($slot['employee_id']);
-            $employeeData = $employee ? [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'color' => $employee->color,
-            ] : null;
-
-            $events[] = [
-                'title' => 'Available',
-                'start' => $start->toDateTimeString(),
-                'end' => $end->toDateTimeString(),
-                'color' => 'green',
-                'employee' => $employeeData,
-            ];
-        }
-
-        return $events;
-    }
-
-    private function getAvailableSlots($openDays, $employees)
-    {
-        $availableSlots = [];
-
+        // Générer les événements du calendrier
         $startDate = now();
         $endDate = now()->addMonth();
 
@@ -116,13 +73,27 @@ class CalendarController extends Controller
                         if ($currentTime + 3600 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                             // Vérifier si le créneau n'est pas pendant la pause du salon
                             if ($currentTime + 3600 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
-                                $slotStart = date('H:i', $currentTime);
-                                $slotEnd = date('H:i', $currentTime + 3600);
-                                $availableSlots[] = [
+                                $slotStart = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime);
+                                $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + 3600);
+
+                                $isSlotReserved = false;
+                                foreach ($appointmentSlots as $appointmentSlot) {
+                                    if ($this->doSlotsOverlap($slotStart, $slotEnd, $appointmentSlot['start'], $appointmentSlot['end']) && $appointmentSlot['employee_id'] == $employee->id) {
+                                        $isSlotReserved = true;
+                                        break;
+                                    }
+                                }
+
+                                $events[] = [
+                                    'title' => $isSlotReserved ? 'Reserved' : 'Available',
                                     'start' => $slotStart,
                                     'end' => $slotEnd,
-                                    'date' => $startDate->format('Y-m-d'),
-                                    'employee_id' => $employee->id,
+                                    'color' => $isSlotReserved ? 'red' : 'green',
+                                    'employee' => [
+                                        'id' => $employee->id,
+                                        'name' => $employee->name,
+                                        'color' => $employee->color,
+                                    ],
                                 ];
                             }
                         }
@@ -134,7 +105,15 @@ class CalendarController extends Controller
             $startDate->addDay(); // Passer au jour suivant
         }
 
-        return $availableSlots;
+        return $events;
+    }
+
+    private function doSlotsOverlap($slot1Start, $slot1End, $slot2Start, $slot2End)
+    {
+        return (
+            (Carbon::parse($slot1Start)->lte(Carbon::parse($slot2End))) &&
+            (Carbon::parse($slot1End)->gte(Carbon::parse($slot2Start)))
+        );
     }
 
     public function assign(Request $request)
