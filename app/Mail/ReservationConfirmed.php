@@ -12,12 +12,14 @@ class ReservationConfirmed extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
-    public $slot;
+    public $appointment;
+    public $prestations;
 
-    public function __construct($user, $slot)
+    public function __construct($user, $appointment, $prestations)
     {
         $this->user = $user;
-        $this->slot = $slot;
+        $this->appointment = $appointment;
+        $this->prestations = $prestations;
     }
 
     public function build()
