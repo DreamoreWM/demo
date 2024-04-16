@@ -74,6 +74,8 @@ class ReservationComponent extends Component
         $this->selectedSlot = null;
         $this->availableSlots = [];
 
+        \Mail::to($user->email)->send(new \App\Mail\ReservationConfirmed($user, $appointment));
+
         return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
     }
 
@@ -101,9 +103,7 @@ class ReservationComponent extends Component
     {
         if ($this->selectedPrestations && $this->selectedEmployee) {
             $employee = Employee::find($this->selectedEmployee);
-            $employeeSchedules = EmployeeSchedule::where('employee_id', $employee->id)
-                ->whereBetween('day_of_week', [0, 6])
-                ->get();
+            $employeeSchedules = EmployeeSchedule::where('employee_id', $employee->id)->get();
 
             $this->availableSlots = [];
 
@@ -120,11 +120,6 @@ class ReservationComponent extends Component
 
             while ($startDate->lte($endDate)) {
                 $dayOfWeek = $startDate->format('w'); // 0 (dimanche) à 6 (samedi)
-
-                // Récupérer les rendez-vous de l'employé pour la date actuelle
-                $appointments = Appointment::where('employee_id', $employee->id)
-                    ->whereDate('start_time', $startDate->format('Y-m-d'))
-                    ->get();
 
                 // Vérifier si le jour est ouvert pour l'employé
                 foreach ($employeeSchedules as $schedule) {
@@ -143,25 +138,13 @@ class ReservationComponent extends Component
                             if ($currentTime + $totalDuration * 60 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                                 // Vérifier si le créneau n'est pas pendant la pause du salon
                                 if ($currentTime + $totalDuration * 60 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
-                                    // Vérifier si le créneau n'est pas déjà réservé
-                                    $isAvailable = true;
-                                    foreach ($appointments as $appointment) {
-                                        $appointmentStart = strtotime($appointment->start_time);
-                                        $appointmentEnd = strtotime($appointment->end_time);
-                                        if ($currentTime >= $appointmentStart && $currentTime < $appointmentEnd) {
-                                            $isAvailable = false;
-                                            break;
-                                        }
-                                    }
-                                    if ($isAvailable && $currentTime >= time()) {
-                                        $slotStart = date('H:i', $currentTime);
-                                        $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
-                                        $this->availableSlots[] = [
-                                            'start' => $slotStart,
-                                            'end' => $slotEnd,
-                                            'date' => $startDate->format('Y-m-d'),
-                                        ];
-                                    }
+                                    $slotStart = date('H:i', $currentTime);
+                                    $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
+                                    $this->availableSlots[] = [
+                                        'start' => $slotStart,
+                                        'end' => $slotEnd,
+                                        'date' => $startDate->format('Y-m-d'),
+                                    ];
                                 }
                             }
                             $currentTime += 3600; // Passer au créneau suivant (1 heure)
