@@ -9,6 +9,11 @@ use App\Models\User;
 use Carbon\Carbon;
 use DateInterval;
 use DateTime;
+use DateTimeZone;
+use Google_Client;
+use Google_Service_Calendar;
+use Google_Service_Calendar_Event;
+use Google_Service_Calendar_EventDateTime;
 use Livewire\Component;
 use App\Models\Prestation;
 use App\Models\Employee;
@@ -71,25 +76,78 @@ class ReservationComponent extends Component
                 $appointment->prestations()->attach($prestationId);
             }
 
+
+
+            $prestations = $appointment->prestations()->get();
+
+            \Mail::to($user->email)->send(new \App\Mail\ReservationConfirmed($user, $appointment, $prestations));
+
+            $employee = Employee::where('id',$this->selectedEmployee)->first();
+
+            \Mail::to($employee->email)->send(new \App\Mail\SlotBookedForEmployee($user, $appointment, $prestations));
+
+            $this->addEventToGoogleCalendar($user, $appointment);
+
             // Réinitialiser les données
             $this->selectedPrestations = [];
             $this->selectedEmployee = null;
             $this->selectedSlot = null;
             $this->availableSlots = [];
 
-            \Mail::to($user->email)->send(new \App\Mail\ReservationConfirmed($user, $appointment));
-
             return redirect('/dashboard')->with('success', 'Le créneau a été réservé avec succès.');
-        } else {
-            // Le créneau n'est pas disponible, masquer le badge
-            $this->availableSlots = $this->getAvailableSlots();
-            return view('reservation.index', [
-                'selectedPrestations' => $this->selectedPrestations,
-                'selectedEmployee' => $this->selectedEmployee,
-                'selectedSlot' => $this->selectedSlot,
-                'availableSlots' => $this->availableSlots,
-            ]);
         }
+    }
+
+    private function addEventToGoogleCalendar($user, $appointment)
+    {
+        $client = new Google_Client();
+        // Configurez le client Google avec vos clés API
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setAccessType('offline');
+
+        if ($user->google_refresh_token) {
+            $client->refreshToken($user->google_refresh_token);
+            $accessToken = $client->getAccessToken();
+            $client->setAccessToken($accessToken);
+
+            $user->google_token = $accessToken['access_token']; // Assurez-vous d'utiliser la clé correcte pour le jeton d'accès
+            // Si disponible, vous pouvez aussi stocker la date d'expiration du jeton et le jeton de rafraîchissement actualisé
+            if (isset($newAccessToken['expires_in'])) {
+                $user->google_token_expires_at = now()->addSeconds($newAccessToken['expires_in']);
+            }
+            if (isset($newAccessToken['refresh_token'])) {
+                $user->google_refresh_token = $newAccessToken['refresh_token'];
+            }
+
+            $user->save();
+        }
+
+        $service = new Google_Service_Calendar($client);
+
+        // Convertir les heures de début et de fin en objets DateTime avec le bon fuseau horaire
+        $startDateTime = new DateTime($appointment->start_time);
+        $startDateTime->setTimezone(new DateTimeZone($user->timezone ?? 'UTC')); // Utiliser le fuseau horaire de l'utilisateur ou 'UTC' par défaut
+        $startDateTime->modify('-2 hours'); // Ajouter 2 heures pour compenser le décalage
+
+        $endDateTime = new DateTime($appointment->end_time);
+        $endDateTime->setTimezone(new DateTimeZone($user->timezone ?? 'UTC'));
+        $endDateTime->modify('-2 hours');
+
+        $startEventDateTime = new Google_Service_Calendar_EventDateTime();
+        $startEventDateTime->setDateTime($startDateTime->format('c'));
+
+        $endEventDateTime = new Google_Service_Calendar_EventDateTime();
+        $endEventDateTime->setDateTime($endDateTime->format('c'));
+
+        $event = new Google_Service_Calendar_Event([
+            'summary' => 'Rendez-vous Coiffeur',
+            'start' => ['dateTime' => $startEventDateTime->getDateTime()],
+            'end' => ['dateTime' => $endEventDateTime->getDateTime()],
+        ]);
+
+        $calendarId = 'primary';
+        $service->events->insert($calendarId, $event);
     }
 
 

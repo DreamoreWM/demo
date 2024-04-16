@@ -2,6 +2,8 @@
 
 namespace App\Mail;
 
+use App\Models\Appointment;
+use App\Models\Prestation;
 use App\Models\Slot;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -15,13 +17,15 @@ class SlotBookedForEmployee extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $slot;
+    public $appointment;
     public $user;
+    public $prestations;
 
-    public function __construct(User $user, Slot $slot)
+    public function __construct($user, $appointment, $prestations)
     {
-        $this->slot = $slot;
+        $this->appointment = $appointment;
         $this->user = $user;
+        $this->prestations = $prestations;
     }
 
     /**
