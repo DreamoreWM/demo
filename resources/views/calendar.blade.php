@@ -217,6 +217,9 @@
 
             <!-- Contenu principal : Calendrier -->
             <div class="col-md-9" >
+                <div id="notification" style="display: none; color: white; background-color: red; text-align: center; padding: 10px;">
+                    Veuillez sélectionner une prestation avant de cliquer sur un rendez-vous libre.
+                </div>
                 <div class="card">
                     <div class="card-header">{{ __('Calendar') }}</div>
                     <div class="card-body">
@@ -417,26 +420,48 @@
                 slotMaxTime: '20:00:00',
                 slotLabelInterval: '01:00',
                 eventClick: function(info) {
+
                     const selectedEmployee = document.getElementById('selectedEmployee');
                     selectedEmployee.value = info.event._def.extendedProps.employee.name;
 
-// Mettre à jour la liste des prestations
+                    // Mettre à jour la liste des prestations
                     const prestationList = document.getElementById('prestationList');
-                    const prestation = JSON.parse(document.getElementById('selectedPrestationsInfos').value);
+                    const selectedPrestationsInfos = document.getElementById('selectedPrestationsInfos').value;
+                    const notification = document.getElementById('notification');
+
+                    if (!selectedPrestationsInfos && info.event.extendedProps.reserved === false) {
+                        // Aucune prestation sélectionnée, afficher la notification
+                        notification.style.display = 'block';
+                    } else {
+                        // Une prestation a été sélectionnée, cacher la notification
+                        notification.style.display = 'none';
+                    }
+
+                    if (selectedPrestationsInfos.trim() !== '') {
+                        try {
+                            prestation = JSON.parse(selectedPrestationsInfos);
+                        } catch (e) {
+                            console.error('Erreur lors de l\'analyse de selectedPrestationsInfos:', e);
+                        }
+                    }
+
+
                     prestationList.innerHTML = '';
                     console.log(prestation);
+                    const prestations = info.event._def.extendedProps.prestations;
                     if (Array.isArray(prestation)) {
                         prestation.forEach(prestation => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `${prestation.name} - ${prestation.duree} minutes`; // Utilisez 'duree' au lieu de 'duration'
+                            listItem.textContent = `${prestation.name} - ${prestation.duree} minutes`;
                             prestationList.appendChild(listItem);
                         });
                     } else {
                         // Si prestations n'est pas un tableau, affichez-le directement
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${prestation.name} - ${prestation.duree} minutes`; // Utilisez 'duree' au lieu de 'duration'
+                        listItem.textContent = `${prestations.name} - ${prestations.duration} minutes`;
                         prestationList.appendChild(listItem);
                     }
+
                     const trashButton = document.querySelector('.icon-trash');
 
                     // Vérifier si un écouteur d'événements a déjà été ajouté
@@ -637,6 +662,9 @@
                 }
 
                 document.getElementById('totalDuration').value = totalPrestationDurationMinutes;
+
+                const notification = document.getElementById('notification');
+                notification.style.display = 'none';
 
                 // Mettre à jour le calendrier avec les créneaux disponibles
                 calendar.removeAllEvents();
