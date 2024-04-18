@@ -92,6 +92,7 @@ class CalendarController extends Controller
                                 }
 
                                 $events[] = [
+                                    'id' => $appointment->id ?? null,
                                     'title' => $isSlotReserved ? 'Reserved' : 'Available',
                                     'start' => $slotStart,
                                     'end' => $slotEnd,
@@ -106,16 +107,16 @@ class CalendarController extends Controller
                                     ],
                                     // Ajouter les informations supplémentaires ici
                                     'client' => [
-                                        'name' => $appointment->bookable->name,
-                                        'email' => $appointment->bookable->email,
+                                        'name' => $appointment->bookable->name ?? null,
+                                        'email' => $appointment->bookable->email ?? null,
                                     ],
-                                    'prestations' => $appointment->prestations->map(function ($prestation) {
+                                    'prestations' => $appointment ?? null ? $appointment->prestations->map(function ($prestation) {
                                         return [
-                                            'id' => $prestation->id,
-                                            'name' => $prestation->nom,
-                                            'duration' => $prestation->temps,
+                                            'id' => $prestation->id ?? null,
+                                            'name' => $prestation->nom ?? null,
+                                            'duration' => $prestation->temps ?? null,
                                         ];
-                                    }),
+                                    }) : null,
                                 ];
                             }
                         }
@@ -256,5 +257,25 @@ class CalendarController extends Controller
     {
         // Logique pour ajouter l'événement au calendrier Google
         // (similaire à la méthode dans ReservationComponent)
+    }
+
+    public function delete(Request $request)
+    {
+        // Récupérer l'ID du rendez-vous à supprimer
+        $appointmentId = $request->input('id');
+
+        // Récupérer le rendez-vous de la base de données
+        $appointment = Appointment::find($appointmentId);
+
+        if ($appointment) {
+            // Supprimer le rendez-vous
+            $appointment->delete();
+
+            // Renvoyer une réponse JSON indiquant que la suppression a réussi
+            return response()->json(['success' => true]);
+        } else {
+            // Renvoyer une réponse JSON indiquant que la suppression a échoué
+            return response()->json(['success' => false, 'error' => 'Appointment not found']);
+        }
     }
 }

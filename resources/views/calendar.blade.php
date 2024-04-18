@@ -229,12 +229,7 @@
                 <div class="top">
                     <div class="icons">
                         <div class="tool">
-                            <div class="icon-circle">
-                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0,0,256,256">
-                                    <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(8.53333,8.53333)"><path d="M22.82813,3c-0.51175,0 -1.02356,0.19544 -1.41406,0.58594l-2.41406,2.41406l5,5l2.41406,-2.41406c0.781,-0.781 0.781,-2.04713 0,-2.82812l-2.17187,-2.17187c-0.3905,-0.3905 -0.90231,-0.58594 -1.41406,-0.58594zM17,8l-11.74023,11.74023c0,0 0.91777,-0.08223 1.25977,0.25977c0.342,0.342 0.06047,2.58 0.48047,3c0.42,0.42 2.64389,0.12436 2.96289,0.44336c0.319,0.319 0.29688,1.29688 0.29688,1.29688l11.74023,-11.74023zM4,23l-0.94336,2.67188c-0.03709,0.10544 -0.05623,0.21635 -0.05664,0.32813c0,0.55228 0.44772,1 1,1c0.11177,-0.00041 0.22268,-0.01956 0.32813,-0.05664c0.00326,-0.00128 0.00652,-0.00259 0.00977,-0.00391l0.02539,-0.00781c0.00196,-0.0013 0.00391,-0.0026 0.00586,-0.00391l2.63086,-0.92773l-1.5,-1.5z"></path></g></g>
-                                </svg>
-                            </div>
-                            <div class="icon-circle">
+                            <div class="icon-circle icon-trash">
                                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="2Opx" viewBox="0,0,256,256">
                                     <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(10.66667,10.66667)"><path d="M10,2l-1,1h-5v2h1v15c0,0.52222 0.19133,1.05461 0.56836,1.43164c0.37703,0.37703 0.90942,0.56836 1.43164,0.56836h10c0.52222,0 1.05461,-0.19133 1.43164,-0.56836c0.37703,-0.37703 0.56836,-0.90942 0.56836,-1.43164v-15h1v-2h-5l-1,-1zM7,5h10v15h-10zM9,7v11h2v-11zM13,7v11h2v-11z"></path></g></g>
                                 </svg>
@@ -379,6 +374,9 @@
             document.getElementById('appointment-card').style.display = 'none';
         });
 
+        // Ajouter un gestionnaire d'événements sur le bouton de la poubelle
+        // Ajouter un gestionnaire d'événements sur le bouton de la poubelle
+
         document.addEventListener('DOMContentLoaded', function() {
             let closeButton = document.querySelector('.modal .close');
 
@@ -395,7 +393,49 @@
                 slotMaxTime: '20:00:00',
                 slotLabelInterval: '01:00',
                 eventClick: function(info) {
-                    console.log(info.event.start);
+                    const trashButton = document.querySelector('.icon-trash');
+
+                    // Vérifier si un écouteur d'événements a déjà été ajouté
+                    if (!trashButton.hasListener) {
+                        trashButton.addEventListener('click', function() {
+                            // Récupérer l'ID du rendez-vous à supprimer
+                            const appointmentId = info.event.id; // Assurez-vous que vos rendez-vous ont un ID unique
+
+                            // Envoyer une requête AJAX pour supprimer le rendez-vous
+                            fetch('/calendar/delete', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Uncomment this line if you're using Laravel
+                                },
+                                body: JSON.stringify({
+                                    id: appointmentId
+                                })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Vérifier si la suppression a réussi
+                                    if (data.success) {
+                                        location.reload();
+                                    } else {
+                                        // Gérer l'erreur de suppression
+                                        console.error('Failed to delete appointment:', data.error);
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error:', error);
+                                })
+                        .finally(() => {
+                                // Recharger les événements du calendrier
+                                calendar.refetchEvents();
+                            });
+                        });
+
+                        calendar.render();
+
+                        // Marquer le bouton de la poubelle comme ayant un écouteur d'événements
+                        trashButton.hasListener = true;
+                    }                    console.log(info.event.start);
 
                     const start = info.event.start;
                     const startTime = start.toISOString().slice(0, 19).replace('T', ' ');
