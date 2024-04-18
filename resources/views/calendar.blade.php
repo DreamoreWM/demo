@@ -374,6 +374,18 @@
             document.getElementById('appointment-card').style.display = 'none';
         });
 
+        document.body.addEventListener('click', function(event) {
+            const appointmentCard = document.getElementById('appointment-card');
+            const calendarEvents = document.querySelectorAll('.fc-event'); // Sélectionne tous les événements de calendrier
+
+            // Vérifie si le clic a été effectué sur l'un des événements
+            const isClickInsideEvent = Array.from(calendarEvents).some(calendarEvent => calendarEvent.contains(event.target));
+
+            if (!appointmentCard.contains(event.target) && !isClickInsideEvent && appointmentCard.style.display !== 'none') {
+                appointmentCard.style.display = 'none';
+            }
+        });
+
         // Ajouter un gestionnaire d'événements sur le bouton de la poubelle
         // Ajouter un gestionnaire d'événements sur le bouton de la poubelle
 
