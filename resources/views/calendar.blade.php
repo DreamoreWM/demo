@@ -429,9 +429,20 @@
                     const selectedPrestationsInfos = document.getElementById('selectedPrestationsInfos').value;
                     const notification = document.getElementById('notification');
 
-                    if (!selectedPrestationsInfos && info.event.extendedProps.reserved === false) {
+                    // Convertir selectedPrestationsInfos en un tableau
+                    let prestationsCheck;
+                    if (selectedPrestationsInfos.trim() !== '') {
+                        try {
+                            prestationsCheck = JSON.parse(selectedPrestationsInfos);
+                        } catch (e) {
+                            console.error('Erreur lors de l\'analyse de selectedPrestationsInfos:', e);
+                        }
+                    }
+
+                    if ((!prestationsCheck || prestationsCheck.length === 0) && info.event.extendedProps.reserved === false) {
                         // Aucune prestation sélectionnée, afficher la notification
                         notification.style.display = 'block';
+                        return;
                     } else {
                         // Une prestation a été sélectionnée, cacher la notification
                         notification.style.display = 'none';
