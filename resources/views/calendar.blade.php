@@ -7,10 +7,14 @@
 
 @section('content')
     <style>
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
         .appointment-detail {
             padding-left: 30px;
             padding-top: 15px;
-            padding-bottom: 10px;
             display: flex;
             align-items: center;
         }
@@ -25,7 +29,7 @@
 
         .container-card {
             width: 450px;
-            height: 330px;
+            max-height: 1000px;
             position: absolute;
             background-color: white;
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2); /* Augmenté pour plus d'ombre */
@@ -151,7 +155,7 @@
 
         .bottom {
             width: 100%;
-            height: 190px;
+            max-height: 1000px;
             padding-top: 15px;
             background-color: #fff;
             box-sizing: border-box;
@@ -254,33 +258,43 @@
                     <div class="appointment-detail">
                         <div class="icon-bottom">
                             <div class="icon-background">
-                                <svg focusable="false" width="20" height="20" viewBox="0 0 24 24" class=" NMm5M"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.8 2L12 10.8 4.8 6h14.4zM4 18V7.87l8 5.33 8-5.33V18H4z"></path></svg>
+                                <svg focusable="false" width="20" height="20" viewBox="-0.5 0 15 15" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="#000000" fill-rule="evenodd" d="M107,154.006845 C107,153.45078 107.449949,153 108.006845,153 L119.993155,153 C120.54922,153 121,153.449949 121,154.006845 L121,165.993155 C121,166.54922 120.550051,167 119.993155,167 L108.006845,167 C107.45078,167 107,166.550051 107,165.993155 L107,154.006845 Z M108,157 L120,157 L120,166 L108,166 L108,157 Z M116.5,163.5 L116.5,159.5 L115.757485,159.5 L114.5,160.765367 L114.98503,161.275112 L115.649701,160.597451 L115.649701,163.5 L116.5,163.5 Z M112.5,163.5 C113.412548,163.5 114,163.029753 114,162.362119 C114,161.781567 113.498099,161.473875 113.110266,161.433237 C113.532319,161.357765 113.942966,161.038462 113.942966,160.550798 C113.942966,159.906386 113.395437,159.5 112.505703,159.5 C111.838403,159.5 111.359316,159.761248 111.051331,160.115385 L111.456274,160.632075 C111.724335,160.370827 112.055133,160.231495 112.425856,160.231495 C112.819392,160.231495 113.13308,160.382438 113.13308,160.690131 C113.13308,160.974601 112.847909,161.102322 112.425856,161.102322 C112.28327,161.102322 112.020913,161.102322 111.952471,161.096517 L111.952471,161.839623 C112.009506,161.833817 112.26616,161.828012 112.425856,161.828012 C112.956274,161.828012 113.190114,161.967344 113.190114,162.275036 C113.190114,162.565312 112.93346,162.768505 112.471483,162.768505 C112.10076,162.768505 111.684411,162.605951 111.427757,162.327286 L111,162.87881 C111.279468,163.227141 111.804183,163.5 112.5,163.5 Z M110,152.5 C110,152.223858 110.214035,152 110.504684,152 L111.495316,152 C111.774045,152 112,152.231934 112,152.5 L112,153 L110,153 L110,152.5 Z M116,152.5 C116,152.223858 116.214035,152 116.504684,152 L117.495316,152 C117.774045,152 118,152.231934 118,152.5 L118,153 L116,153 L116,152.5 Z" transform="translate(-107 -152)"></path> </g></svg>
                             </div>
                         </div>
-                        <p>Jeudi, 18 avril • 9:00 à 9:40am</p>
+                        <p></p>
                     </div>
                     <div class="appointment-detail">
+                        <div class="icon-bottom">
+                            <div class="icon-background">
+                                <svg focusable="false" width="20" height="20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:#000000;} </style> <g> <path class="st0" d="M256.008,411.524c54.5,0,91.968-7.079,92.54-13.881c2.373-28.421-34.508-43.262-49.381-48.834 c-7.976-2.984-19.588-11.69-19.588-17.103c0-3.587,0-8.071,0-14.214c4.611-5.119,8.095-15.532,10.183-27.317 c4.857-1.738,7.627-4.524,11.095-16.65c3.69-12.93-5.548-12.5-5.548-12.5c7.468-24.715-2.357-47.944-18.825-46.246 c-11.358-19.857-49.397,4.54-61.31,2.841c0,6.818,2.834,11.92,2.834,11.92c-4.143,7.882-2.548,23.564-1.389,31.485 c-0.667,0-9.016,0.079-5.468,12.5c3.452,12.126,6.23,14.912,11.088,16.65c2.079,11.786,5.571,22.198,10.198,27.317 c0,6.143,0,10.627,0,14.214c0,5.413-12.35,14.548-19.611,17.103c-14.953,5.262-51.746,20.413-49.373,48.834 C164.024,404.444,201.491,411.524,256.008,411.524z"></path> <path class="st0" d="M404.976,56.889h-75.833v16.254c0,31.365-25.524,56.889-56.889,56.889h-32.508 c-31.366,0-56.889-25.524-56.889-56.889V56.889h-75.834c-25.444,0-46.071,20.627-46.071,46.071v362.969 c0,25.444,20.627,46.071,46.071,46.071h297.952c25.445,0,46.072-20.627,46.072-46.071V102.96 C451.048,77.516,430.421,56.889,404.976,56.889z M402.286,463.238H109.714V150.349h292.572V463.238z"></path> <path class="st0" d="M239.746,113.778h32.508c22.405,0,40.635-18.23,40.635-40.635V40.635C312.889,18.23,294.659,0,272.254,0 h-32.508c-22.406,0-40.635,18.23-40.635,40.635v32.508C199.111,95.547,217.341,113.778,239.746,113.778z M231.619,40.635 c0-4.492,3.634-8.127,8.127-8.127h32.508c4.492,0,8.127,3.635,8.127,8.127v16.254c0,4.492-3.635,8.127-8.127,8.127h-32.508 c-4.493,0-8.127-3.635-8.127-8.127V40.635z"></path> </g> </g></svg>                            </div>
+                        </div>
+                        <p>Alexandre Idziak</p>
+                    </div>
+                    <div class="appointment-detail">
+                        <div class="icon-bottom">
+                            <div class="icon-background">
+                                <svg focusable="false" width="20" height="20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 477.297 477.297" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <path d="M42.85,358.075c0-24.138,0-306.758,0-330.917c23.9,0,278.867,0,302.767,0c0,8.542,0,49.44,0,99.722 c5.846-1.079,11.842-1.812,17.99-1.812c3.149,0,6.126,0.647,9.232,0.928V0H15.649v385.233h224.638v-27.158 C158.534,358.075,57.475,358.075,42.85,358.075z"></path> <path d="M81.527,206.842h184.495c1.812-10.16,5.393-19.608,10.095-28.452H81.527V206.842z"></path> <rect x="81.527" y="89.432" width="225.372" height="28.452"></rect> <path d="M81.527,295.822h191.268c5.112-3.106,10.57-5.63,16.415-7.183c-5.544-6.45-10.095-13.697-13.978-21.269H81.527V295.822z"></path> <path d="M363.629,298.669c41.071,0,74.16-33.197,74.16-74.139c0-40.984-33.09-74.16-74.16-74.16 c-40.898,0-74.009,33.176-74.009,74.16C289.62,265.472,322.731,298.669,363.629,298.669z"></path> <path d="M423.143,310.706H304.288c-21.226,0-38.612,19.457-38.612,43.422v119.33c0,1.316,0.604,2.481,0.69,3.84h194.59 c0.086-1.337,0.69-2.524,0.69-3.84v-119.33C461.733,330.227,444.39,310.706,423.143,310.706z"></path> </g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> </g> </g></svg>                            </div>
+                        </div>
+                        <p>Alexandre Idziak</p>
+                    </div>
+                    <div class="appointment-detail" style="padding-bottom: 25px">
                         <div class="icon-bottom">
                             <div class="icon-background">
                                 <svg focusable="false" width="20" height="20" viewBox="0 0 24 24" class=" NMm5M"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.8 2L12 10.8 4.8 6h14.4zM4 18V7.87l8 5.33 8-5.33V18H4z"></path></svg>
                             </div>
                         </div>
-                        <p>30 minutes avant, par e-mail</p>
+                        <p></p>
                     </div>
-                    <div class="appointment-detail">
+                    <div style="text-align: center">
+                        <h1 style="font-size: 20px; font-weight: bold">Prestations à effectuées : </h1>
+                    </div>
+                    <div class="appointment-detail" style="padding-bottom: 25px">
                         <div class="icon-bottom">
                             <div class="icon-background">
-                                <svg focusable="false" width="20" height="20" viewBox="0 0 24 24" class=" NMm5M"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.8 2L12 10.8 4.8 6h14.4zM4 18V7.87l8 5.33 8-5.33V18H4z"></path></svg>
                             </div>
                         </div>
                         <p>Alexandre Idziak</p>
                     </div>
-                    <p id="appointmentTitle"></p>
-                    <p id="appointmentStart"></p>
-                    <p id="appointmentEmployee"></p>
-                    <p id="appointmentClientName"></p>
-                    <p id="appointmentClientEmail"></p>
-                    <p id="appointmentPrestations"></p>
                 </div>
             </div>
 
@@ -395,39 +409,55 @@
 
                        var appointmentDetailElements = document.querySelectorAll('.appointment-detail p');
 
+                       var options = { month: 'long', day: 'numeric' };
+                       var formattedDate = start.toLocaleDateString('fr-FR', options);
+
                        // Mettre à jour les éléments de la carte avec les informations de l'événement
-                       appointmentDetailElements[0].textContent = info.event.title; // Mettre à jour le titre
-                       appointmentDetailElements[1].textContent = info.event.start.toISOString(); // Mettre à jour la date de début
-                       appointmentDetailElements[2].textContent = info.event.extendedProps.employee.name; // Mettre à jour le nom de l'employé
+                       appointmentDetailElements[0].textContent = 'Le ' + formattedDate + ' de ' + info.event.extendedProps.start_time + ' à ' + info.event.extendedProps.end_time;
+                       appointmentDetailElements[1].textContent = 'Employée: ' + info.event.extendedProps.employee.name; // Mettre à jour le nom de l'employé
+                       appointmentDetailElements[2].textContent  = 'Client: ' + info.event.extendedProps.client.name;
+                       appointmentDetailElements[3].textContent  = 'Email client: ' + info.event.extendedProps.client.email;
+                       var prestationsList = document.createElement('ul');
+                       info.event.extendedProps.prestations.forEach(function(prestation) {
+                           var listItem = document.createElement('li');
+                           listItem.textContent = prestation.name + ' (Durée : ' + prestation.duration + ' minutes)';
+                           prestationsList.appendChild(listItem);
+                       });
+                       appointmentDetailElements[4].innerHTML = '';
+                       appointmentDetailElements[4].appendChild(prestationsList);
 
                        // Positionner le container-card à gauche de l'événement
+
                        const eventRect = info.el.getBoundingClientRect();
-                       const initialLeft = info.jsEvent.pageX - 530;
-                       appointmentCard.style.left = `${initialLeft}px`;
+                       const eventBottom = eventRect.bottom - 300;
+                       const eventLeft = eventRect.left - 450;
 
-                       appointmentCard.style.top = `${info.jsEvent.pageY - 315}px`;
+// Set the position of the appointmentCard to the bottom left corner of the event
+                       appointmentCard.style.top = `${eventBottom}px`;
+                       appointmentCard.style.left = `${eventLeft}px`;
 
-                       // Retirer la classe 'slide-in' avant d'ajouter la nouvelle règle d'animation
+// Remove the 'slide-in' class before adding the new animation rule
                        appointmentCard.classList.remove('slide-in');
 
-                       // Supprimer la règle d'animation précédente
+// Remove the previous animation rule
                        const styleSheet = document.styleSheets[0];
                        const previousRuleIndex = styleSheet.cssRules.length - 1;
                        if (styleSheet.cssRules[previousRuleIndex].name === 'slideInFromRight') {
                            styleSheet.deleteRule(previousRuleIndex);
                        }
 
-                       // Mettre à jour l'animation pour qu'elle commence à la position de l'événement cliqué et se termine légèrement à gauche
+// Update the animation to start from the position of the event and end slightly to the left
                        const keyframes = `@keyframes slideInFromRight {
-            0% {
-                left: ${initialLeft}px;
-                opacity: 0;
-            }
-            100% {
-                left: ${initialLeft - 30}px;
-                opacity: 1;
-            }
-        }`;
+    0% {
+        left: ${eventLeft}px;
+        opacity: 0;
+    }
+    100% {
+        left: ${eventLeft - 30}px;
+        opacity: 1;
+    }
+}`;
+
                        styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
 
                        // Ajouter la classe 'slide-in' pour déclencher l'animation dans une nouvelle boucle d'événements du navigateur

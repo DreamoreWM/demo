@@ -50,6 +50,7 @@ class CalendarController extends Controller
                 'start' => $start->format('Y-m-d H:i'),
                 'end' => $end->format('Y-m-d H:i'),
                 'employee_id' => $appointment->employee_id,
+                'appointment_id' => $appointment->id,
             ];
         }
 
@@ -85,6 +86,7 @@ class CalendarController extends Controller
                                 foreach ($appointmentSlots as $appointmentSlot) {
                                     if ($this->doSlotsOverlap($slotStart, $slotEnd, $appointmentSlot['start'], $appointmentSlot['end']) && $appointmentSlot['employee_id'] == $employee->id) {
                                         $isSlotReserved = true;
+                                        $appointment = $appointments->firstWhere('id', $appointmentSlot['appointment_id']);
                                         break;
                                     }
                                 }
@@ -93,6 +95,8 @@ class CalendarController extends Controller
                                     'title' => $isSlotReserved ? 'Reserved' : 'Available',
                                     'start' => $slotStart,
                                     'end' => $slotEnd,
+                                    'start_time' => $isSlotReserved ? Carbon::parse($appointment->start_time)->format('H:i:s') : null,
+                                    'end_time' => $isSlotReserved ? Carbon::parse($appointment->end_time)->format('H:i:s') : null,
                                     'reserved' => $isSlotReserved,
                                     'color' => $isSlotReserved ? 'red' : 'green',
                                     'employee' => [
