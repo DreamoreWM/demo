@@ -318,6 +318,18 @@
                         <input type="hidden" name="selectedPrestationsInfos" id="selectedPrestationsInfos">
                         <input type="hidden" name="eventStart" id="eventStart">
                         <input type="hidden" name="totalDuration" id="totalDuration">
+                        <!-- Ajout du champ pour l'employé sélectionné -->
+                        <div class="form-group">
+                            <label for="selectedEmployee">Employé sélectionné :</label>
+                            <input type="text" id="selectedEmployee" class="form-control" readonly>
+                        </div>
+
+                        <!-- Ajout de la div pour la liste des prestations -->
+                        <div class="form-group">
+                            <label>Prestations à effectuer :</label>
+                            <div id="prestationList"></div>
+                        </div>
+
                         <div class="form-group">
                             <label for="userId">Choisir un Client</label>
                             <select name="user_id" id="userId" class="form-control">
@@ -405,6 +417,26 @@
                 slotMaxTime: '20:00:00',
                 slotLabelInterval: '01:00',
                 eventClick: function(info) {
+                    const selectedEmployee = document.getElementById('selectedEmployee');
+                    selectedEmployee.value = info.event._def.extendedProps.employee.name;
+
+// Mettre à jour la liste des prestations
+                    const prestationList = document.getElementById('prestationList');
+                    const prestation = JSON.parse(document.getElementById('selectedPrestationsInfos').value);
+                    prestationList.innerHTML = '';
+                    console.log(prestation);
+                    if (Array.isArray(prestation)) {
+                        prestation.forEach(prestation => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `${prestation.name} - ${prestation.duree} minutes`; // Utilisez 'duree' au lieu de 'duration'
+                            prestationList.appendChild(listItem);
+                        });
+                    } else {
+                        // Si prestations n'est pas un tableau, affichez-le directement
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${prestation.name} - ${prestation.duree} minutes`; // Utilisez 'duree' au lieu de 'duration'
+                        prestationList.appendChild(listItem);
+                    }
                     const trashButton = document.querySelector('.icon-trash');
 
                     // Vérifier si un écouteur d'événements a déjà été ajouté
@@ -447,14 +479,10 @@
 
                         // Marquer le bouton de la poubelle comme ayant un écouteur d'événements
                         trashButton.hasListener = true;
-                    }                    console.log(info.event.start);
+                    }
 
                     const start = info.event.start;
                     const startTime = start.toISOString().slice(0, 19).replace('T', ' ');
-
-                    console.log(startTime);
-
-                    console.log(info.event);
 
                    if(info.event.extendedProps.reserved === true) {
                        const appointmentCard = document.getElementById('appointment-card');
@@ -573,8 +601,6 @@
 
                 document.getElementById('selectedPrestationsInfos').value = selectedPrestationsInfos
 
-                console.log(selectedPrestationsInfos);
-
                 // Calculer la durée totale des prestations sélectionnées
                 const totalPrestationDurationMinutes = selectedPrestations.reduce((total, current) => total + current, 0);
                 const slotsNeeded = Math.ceil(totalPrestationDurationMinutes / 60); // Chaque créneau dure 60 minutes
@@ -609,9 +635,6 @@
                         // Ne pas sauter les créneaux déjà couverts car ils peuvent démarrer une nouvelle série valide
                     }
                 }
-
-                console.log(totalPrestationDurationMinutes);
-                console.log(filteredByEmployee);
 
                 document.getElementById('totalDuration').value = totalPrestationDurationMinutes;
 
