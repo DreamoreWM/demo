@@ -335,7 +335,7 @@
 
                         <div class="form-group">
                             <label for="userId">Choisir un Client</label>
-                            <select name="user_id" id="userId" class="form-control">
+                            <select name="user_id" id="userId" class="form-control" required>
                                 <option value="">Sélectionnez un utilisateur</option>
                                 @foreach($users as $user)
                                     <option value="{{ 'user-'.$user->id }}">{{ $user->name }} (User)</option>

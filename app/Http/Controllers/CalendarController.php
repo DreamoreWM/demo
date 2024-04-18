@@ -143,8 +143,6 @@ class CalendarController extends Controller
     {
         $user_id = $request->input('user_id');
 
-
-
         $employee_id = $request->input('employeeId');
         $selectedPrestationsInfos = json_decode($request->input('selectedPrestationsInfos'), true);
         $eventStart = Carbon::createFromFormat('Y-m-d H:i:s', $request->input('eventStart'));
