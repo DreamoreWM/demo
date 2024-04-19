@@ -458,7 +458,6 @@
 
 
                     prestationList.innerHTML = '';
-                    console.log(prestation);
                     const prestations = info.event._def.extendedProps.prestations;
                     if (Array.isArray(prestation)) {
                         prestation.forEach(prestation => {
