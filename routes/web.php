@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/employees/{employee}/schedule', [EmployeeScheduleController::class, 'edit'])->name('employees.schedule.edit');
     Route::post('/employees/{employee}/schedule', [EmployeeScheduleController::class, 'store'])->name('employees.schedule.store');
     Route::post('/calendar', [CalendarController::class, 'assign'])->name('calendar.assign');
-
+    Route::post('/calendar/delete', [CalendarController::class, 'delete']);
 
 });
 
