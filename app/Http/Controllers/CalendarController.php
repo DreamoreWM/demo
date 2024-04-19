@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Absence;
 use App\Models\Appointment;
 use App\Models\Employee;
 use App\Models\EmployeeSchedule;
@@ -64,6 +65,8 @@ class CalendarController extends Controller
             foreach ($employees as $employee) {
                 $employeeSchedule = $employee->schedules()->where('day_of_week', $dayOfWeek)->first();
 
+                $absences = Absence::where('employee_id', $employee->id)->get();
+
                 if ($employeeSchedule) {
                     $openHours = $openDays[strtolower($startDate->format('l'))];
                     $scheduleStart = strtotime($employeeSchedule->start_time);
@@ -76,6 +79,24 @@ class CalendarController extends Controller
                     $currentTime = max($scheduleStart, strtotime($openHours['open']));
                     while ($currentTime + 3600 <= min($scheduleEnd, strtotime($openHours['close']))) {
                         // Vérifier si le créneau n'est pas pendant la pause de l'employé
+                        $isDuringAbsence = false;
+                        foreach ($absences as $absence) {
+                            $absenceStart = Carbon::parse($absence->start_time)->format('Y-m-d H:i');
+                            $absenceEnd = Carbon::parse($absence->end_time)->format('Y-m-d H:i');
+                            $slotStart = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime);
+                            $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + 3600);
+
+                            if ($this->doSlotsOverlap($slotStart, $slotEnd, $absenceStart, $absenceEnd)) {
+                                $isDuringAbsence = true;
+                                break;
+                            }
+                        }
+
+                        if ($isDuringAbsence) {
+                            $currentTime += 3600;
+                            continue;
+                        }
+
                         if ($currentTime + 3600 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                             // Vérifier si le créneau n'est pas pendant la pause du salon
                             if ($currentTime + 3600 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
@@ -214,29 +235,6 @@ class CalendarController extends Controller
 
             return redirect('/calendar')->with('success', 'Le créneau a été réservé avec succès.');
 
-    }
-
-    private function isSlotAvailable($startTime, $endTime, $employeeId)
-    {
-        $requestedSlot = [
-            'start' => Carbon::parse($startTime),
-            'end' => Carbon::parse($endTime),
-        ];
-
-        $existingAppointments = Appointment::where('employee_id', $employeeId)->get();
-
-        foreach ($existingAppointments as $appointment) {
-            $existingSlot = [
-                'start' => Carbon::parse($appointment->start_time),
-                'end' => Carbon::parse($appointment->end_time),
-            ];
-
-            if ($this->doSlotsOverlap($requestedSlot, $existingSlot)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function getSelectedPrestations(Request $request)
