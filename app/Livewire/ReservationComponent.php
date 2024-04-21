@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Absence;
 use App\Models\Appointment;
 use App\Models\EmployeeSchedule;
 use App\Models\SalonSetting;
@@ -51,7 +52,7 @@ class ReservationComponent extends Component
         $endDatetime->add(new DateInterval('PT' . $totalDuration . 'M'));
 
         // Vérifier si le créneau est disponible
-        if ($this->isSlotAvailable($startDatetime, $endDatetime)) {
+        if ($this->isSlotAvailable($startDatetime, $endDatetime, $this->selectedEmployee)) {
             // Mettre à jour le tableau $selectedSlot avec l'heure de fin
             $this->selectedSlot = [
                 'date' => $date,
@@ -152,14 +153,17 @@ class ReservationComponent extends Component
 
 
 
-    private function isSlotAvailable($startDatetime, $endDatetime)
+    private function isSlotAvailable($startTime, $endTime, $employeeId)
     {
         $requestedSlot = [
-            'start' => Carbon::parse($startDatetime),
-            'end' => Carbon::parse($endDatetime),
+            'start' => Carbon::parse($startTime),
+            'end' => Carbon::parse($endTime),
         ];
 
-        $existingAppointments = Appointment::all();
+        $existingAppointments = Appointment::where('employee_id', $employeeId)->get();
+
+        // Retrieve the absences of the employee
+        $absences = Absence::where('employee_id', $employeeId)->get();
 
         foreach ($existingAppointments as $appointment) {
             $existingSlot = [
@@ -172,9 +176,20 @@ class ReservationComponent extends Component
             }
         }
 
+        // Check the absences
+        foreach ($absences as $absence) {
+            $absenceSlot = [
+                'start' => Carbon::parse($absence->start_time),
+                'end' => Carbon::parse($absence->end_time),
+            ];
+
+            if ($this->doSlotsOverlap($requestedSlot, $absenceSlot)) {
+                return false;
+            }
+        }
+
         return true;
     }
-
     private function doSlotsOverlap($slot1, $slot2)
     {
         return $slot1['start']->lte($slot2['end']) && $slot1['end']->gte($slot2['start']);
@@ -244,7 +259,7 @@ class ReservationComponent extends Component
                                     $endDatetime->add(new DateInterval('PT' . $totalDuration . 'M'));
 
                                     // Vérifier si le créneau est disponible
-                                    if ($this->isSlotAvailable($startDatetime, $endDatetime)) {
+                                    if ($this->isSlotAvailable($startDatetime, $endDatetime, $this->selectedEmployee)) {
                                         $slotStart = date('H:i', $currentTime);
                                         $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
                                         $this->availableSlots[] = [
