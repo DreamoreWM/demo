@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EmployeeCalendarController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SalonController;
 use App\Http\Livewire\EmployeeCalendar;
 use Illuminate\Support\Facades\Route;
@@ -68,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/calendar', [CalendarController::class, 'assign'])->name('calendar.assign');
     Route::post('/calendar/delete', [CalendarController::class, 'delete']);
     Route::resource('/absences',AbsenceController::class);
-
+    Route::resource('/reviews', ReviewController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('generate:slots'); // Exemple: tous les lundis à 1h00
+        $schedule->command('check:appointments')->everyMinute();
     }
 
 
