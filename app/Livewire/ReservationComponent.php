@@ -15,6 +15,7 @@ use Google_Client;
 use Google_Service_Calendar;
 use Google_Service_Calendar_Event;
 use Google_Service_Calendar_EventDateTime;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use App\Models\Prestation;
 use App\Models\Employee;
@@ -99,30 +100,53 @@ class ReservationComponent extends Component
         }
     }
 
-    private function addEventToGoogleCalendar($user, $appointment)
+    public function refreshGoogleToken($user)
     {
         $client = new Google_Client();
-        // Configurez le client Google avec vos clés API
         $client->setClientId(env('GOOGLE_CLIENT_ID'));
         $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
         $client->setAccessType('offline');
 
         if ($user->google_refresh_token) {
             $client->refreshToken($user->google_refresh_token);
-            $accessToken = $client->getAccessToken();
-            $client->setAccessToken($accessToken);
+            $newAccessToken = $client->getAccessToken();
 
-            $user->google_token = $accessToken['access_token']; // Assurez-vous d'utiliser la clé correcte pour le jeton d'accès
-            // Si disponible, vous pouvez aussi stocker la date d'expiration du jeton et le jeton de rafraîchissement actualisé
-            if (isset($newAccessToken['expires_in'])) {
-                $user->google_token_expires_at = now()->addSeconds($newAccessToken['expires_in']);
-            }
-            if (isset($newAccessToken['refresh_token'])) {
-                $user->google_refresh_token = $newAccessToken['refresh_token'];
-            }
+            if (isset($newAccessToken['access_token'])) {
+                $user->google_token = $newAccessToken['access_token']; // Mettre à jour le jeton d'accès dans le client Google
 
-            $user->save();
+                // Stocker le nouveau jeton d'accès et le jeton de rafraîchissement dans la base de données
+                if (isset($newAccessToken['expires_in'])) {
+                    $user->token_expires_at = now()->addSeconds($newAccessToken['expires_in'] + 7400);
+                }
+                if (isset($newAccessToken['refresh_token'])) {
+                    $user->google_refresh_token = $newAccessToken['refresh_token'];
+                }
+
+                $user   ->save();
+            } else {
+                // Gérer l'erreur si le nouveau jeton d'accès n'est pas disponible
+                Log::log('Une erreur s\'est produite lors de la récupération du nouveau jeton d\'accès.');
+            }
+        } else {
+            throw new Exception('No refresh token is available');
         }
+    }
+
+    private function addEventToGoogleCalendar($user, $appointment)
+    {
+        $this->refreshGoogleToken($user);
+
+        $client = new Google_Client();
+        // Configurez le client Google avec vos clés API
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setAccessType('offline');
+
+        $client->refreshToken($user->google_refresh_token);
+        $accessToken = $client->getAccessToken();
+        $client->setAccessToken($accessToken);
+
+        $user->google_token = $accessToken['access_token'];
 
         $service = new Google_Service_Calendar($client);
 
