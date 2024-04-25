@@ -1,4 +1,16 @@
 <style>
+
+    .home {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%; /* Change this */
+    }
+
+    .photo {
+        margin-bottom: -15px;
+    }
+
     .gsi-material-button {
         -moz-user-select: none;
         -webkit-user-select: none;
@@ -109,12 +121,25 @@
         width: 100%;
     }
     .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         background-image: url('/images/background-home.webp');
         background-size: cover; /* Couvre toute la zone disponible sans redimensionner l'image */
+        background-position: center;
         background-repeat: no-repeat; /* Empêche la répétition de l'image */
-        background-position: center center; /* Centre l'image dans la zone de contenu */
+        background-attachment: fixed; /* Fixe l'arrière-plan par rapport à la fenêtre du navigateur */
         /* Définissez une hauteur fixe ou utilisez flexbox/grid pour définir la hauteur */
-        height: calc(100vh - 100px); /* 100vh est la hauteur de la fenêtre, -100px pour l'espace du header/footer */
+        height: calc(100vh - 60px); /* 100vh est la hauteur de la fenêtre, -100px pour l'espace du header/footer */
+        margin: 0; /* Reset margin */
+        padding: 0; /* Reset padding */
+    }
+
+    @media (max-height: 580px) {
+        .content {
+            height: auto;
+        }
     }
     .booking-btn:hover {
         background-color: #45a049; /* Un peu plus foncé que le couleur du bouton */
@@ -144,7 +169,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x-circle"></i></button>
                 </div>
             @endif
-            <div class="home" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 100px - 260px);">
+            <div class="home" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                 <div style="background: rgba(255, 255, 255, 0.8); margin-bottom: 10px; padding: 15px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center;">
                     <img src="/images/logo.png" alt="Logo Salon de Coiffure" style="max-width: 160px;"> <!-- Ajustez max-width en fonction de la taille réelle de votre logo -->
                 </div>
@@ -158,6 +183,11 @@
                         Prendre un rendez-vous
                     </button>
                 @endif
+
+                <div>
+                    @include('reviews.index', ['reviews' => $reviews])
+                </div>
+
 
             </div>
 
@@ -219,16 +249,16 @@
     </div>
 
 
-    <footer style="background-color: #767473; padding: 20px; text-align: center; border-top: 1px solid #e7e7e7;">
-        <div style="margin-bottom: 20px;">
-            <a href="/about" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">À propos</a>
-            <a href="/services" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">Services</a>
-            <a href="/contact" style="text-decoration: none; color: #FFFFFF;">Contact</a>
-        </div>
-        <div>
-            <p style="margin: 0; color: #E2E2E2;">© 2024 MonSiteWeb. Tous droits réservés.</p>
-            <p style="margin: 0; color: #E2E2E2;">contact@monsiteweb.com | +33 1 23 45 67 89</p>
-        </div>
-    </footer>
+{{--    <footer style="background-color: #767473; padding: 10px; text-align: center; border-top: 1px solid #e7e7e7;">--}}
+{{--        <div style="margin-bottom: 10px;">--}}
+{{--            <a href="/about" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">À propos</a>--}}
+{{--            <a href="/services" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">Services</a>--}}
+{{--            <a href="/contact" style="text-decoration: none; color: #FFFFFF;">Contact</a>--}}
+{{--        </div>--}}
+{{--        <div>--}}
+{{--            <p style="margin: 0; color: #E2E2E2;">© 2024 MonSiteWeb. Tous droits réservés.</p>--}}
+{{--            <p style="margin: 0; color: #E2E2E2;">contact@monsiteweb.com | +33 1 23 45 67 89</p>--}}
+{{--        </div>--}}
+{{--    </footer>--}}
 </x-app-layout>
 

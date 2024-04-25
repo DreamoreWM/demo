@@ -128,7 +128,7 @@
     }
 </style>
 
-<form method="POST" action="/reviews">
+<form method="POST" action="/reviews" enctype="multipart/form-data">>
     @csrf
     <input type="hidden" name="appointment_id" value="{{ $appointmentId }}">
     <div class="background-container">
@@ -154,6 +154,8 @@
             <div class="card-body">
                 <label for="comment">Commentaire :</label>
                 <textarea id="comment" name="comment"></textarea>
+                <label for="photos">Photos :</label>
+                <input type="file" id="photos" name="photos[]" multiple>
                 <button type="submit">Envoyer</button>
             </div>
         </div>
