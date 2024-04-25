@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeCalendarController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SalonController;
 use App\Http\Livewire\EmployeeCalendar;
+use App\Models\Review;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SlotController;
 use App\Http\Controllers\UsersController;
@@ -28,9 +30,7 @@ use App\Http\Controllers\EmployeeScheduleController;
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+Route::resource('/', DashboardController::class);
 
 // Route pour la redirection vers Google
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('auth.google');
@@ -38,8 +38,10 @@ Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('a
 // Route pour le callback de Google
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
+
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $reviews = Review::all();
+    return view('dashboard', ['reviews' => $reviews]);
 })->name('dashboard');
 
 Route::get('/confidentiality', function () {
