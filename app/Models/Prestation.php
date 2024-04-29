@@ -12,7 +12,7 @@ class Prestation extends Model
 
     // Protéger les champs assignables en masse
     protected $fillable = [
-        'nom', 'description', 'prix', 'temps',
+        'nom', 'description', 'prix', 'temps','category_id'
     ];
 
     /**
@@ -27,5 +27,10 @@ class Prestation extends Model
     public function appointments()
     {
         return $this->belongsToMany(Appointment::class, 'appointment_prestation');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

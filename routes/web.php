@@ -39,10 +39,7 @@ Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('a
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 
-Route::get('/dashboard', function () {
-    $reviews = Review::all();
-    return view('dashboard', ['reviews' => $reviews]);
-})->name('dashboard');
+Route::resource('/dashboard', DashboardController::class);
 
 Route::get('/confidentiality', function () {
     return view('confidentiality');

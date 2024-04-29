@@ -2,17 +2,48 @@
 
 namespace App\Livewire;
 
+use App\Models\Category;
 use Livewire\Component;
 use App\Models\Prestation;
 
 class PrestationsManagement extends Component
 {
-    public $nom, $description, $prix, $temps;
-    public $prestations;
+    public $nom, $description, $prix, $temps, $category_id;
+    public $prestations, $categories;
+    protected $listeners = ['categoryDeleted' => 'refreshCategories', 'categoryAdded' => 'handleCategoryAdded'];
 
     public function mount()
     {
         $this->prestations = Prestation::all();
+        $this->categories = Category::all(); // Ajoutez cette ligne
+
+    }
+
+    #[On('categoryAdded')]
+    public function handleCategoryAdded()
+    {
+        session()->flash('message', 'Une nouvelle catégorie a été ajoutée.');
+        $this->categories = Category::all(); // Recharger les catégories après l'ajout
+    }
+
+    public function deleteCategory($categoryId)
+    {
+        $category = Category::find($categoryId);
+
+        if ($category) {
+            if ($category->prestations->count() > 0) {
+                session()->flash('error', 'La catégorie ne peut pas être supprimée car elle a des prestations associées.');
+            } else {
+                $category->delete();
+                $this->categories = Category::all(); // Recharger les catégories après suppression
+
+                session()->flash('message', 'Catégorie supprimée avec succès.');
+            }
+        } else {
+            session()->flash('error', 'La catégorie n\'a pas pu être trouvée.');
+        }
+
+        $this->dispatch('categoryDeleted');
     }
 
     public function addPrestation()
@@ -22,6 +53,8 @@ class PrestationsManagement extends Component
             'description' => 'required',
             'prix' => 'required|numeric',
             'temps' => 'required|integer',
+            'category_id' => 'required', // Utilisez category_id pour associer la prestation à une catégorie
+
         ]);
 
         Prestation::create([
@@ -29,6 +62,7 @@ class PrestationsManagement extends Component
             'description' => $this->description,
             'prix' => $this->prix,
             'temps' => $this->temps,
+            'category_id' => $this->category_id, // Utilisez category_id pour associer la prestation à une catégorie
         ]);
 
         $this->prestations = Prestation::all(); // Recharger les prestations
