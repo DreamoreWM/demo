@@ -160,7 +160,7 @@
 
     #customers-testimonials .item {
         text-align: center;
-        padding: 50px;
+        padding: 10px;
         opacity: .2;
         -webkit-transform: scale3d(0.8, 0.8, 1);
         transform: scale3d(0.8, 0.8, 1);
