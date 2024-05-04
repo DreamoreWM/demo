@@ -28,6 +28,11 @@
                 <input type="number" class="form-control" id="slot_duration" name="slot_duration" value="{{ old('slot_duration', $setting->slot_duration) }}" placeholder="Durée d'un Créneau (en minutes)">
             </div>
 
+            <div class="mb-3">
+                <label for="facebook_page_url" class="form-label">Nom page facebook</label>
+                <input type="text" class="form-control" id="facebook_page_url" name="facebook_page_url" value="{{ old('facebook_page_url', $setting->facebook_page_url) }}" placeholder='(Exemple pour "people/NOM-PAGE-FACEBOOK/100063490666722/" -> "NOM-PAGE-FACEBOOK-100063490666722"'>
+            </div>
+
             @php
                 $openDays = $setting->open_days ? json_decode($setting->open_days, true) : [];
             @endphp

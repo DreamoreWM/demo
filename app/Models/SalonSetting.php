@@ -9,7 +9,7 @@ class SalonSetting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'open_days', 'slot_duration'];
+    protected $fillable = ['name', 'address', 'open_days', 'slot_duration', 'facebook_page_url'];
 
     public function employees()
     {
