@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PrestationController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SalonSettingsController;
+use App\Http\Controllers\PhotoPresController;
 use App\Http\Controllers\EmployeeScheduleController;
 
 /*
@@ -69,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/calendar/delete', [CalendarController::class, 'delete']);
     Route::resource('/absences',AbsenceController::class);
     Route::resource('/reviews', ReviewController::class);
+    Route::resource('/photos', PhotoPresController::class);
 });
 
 require __DIR__.'/auth.php';
