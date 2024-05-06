@@ -15,12 +15,19 @@ use Illuminate\Http\Request;
 
 class CalendarController extends Controller
 {
+    public $slotDurationInMinutes;
+    public $slotDurationInSec;
     public function index()
     {
         $appointments = Appointment::all();
         $employees = Employee::all();
         $prestations = Prestation::all();
         $setting = SalonSetting::first();
+        $slotDurationInMinutes = SalonSetting::first()->slot_duration;
+        $slotDuration = gmdate("H:i", $slotDurationInMinutes * $slotDurationInMinutes);
+        $slotDurationInSec = $slotDurationInMinutes * 60;
+        $this->slotDurationInSec = $slotDurationInSec;
+        $this->slotDurationInMinutes = $slotDurationInMinutes;
         $openDays = json_decode($setting->open_days, true);
 
         $users = User::all();
@@ -34,6 +41,9 @@ class CalendarController extends Controller
             'prestations' => $prestations,
             'users' => $users,
             'temporaryUsers' => $temporaryUsers,
+            'slotDuration' => $slotDuration,
+            'slotDurationInMinutes' => $slotDurationInMinutes,
+            'slotDurationInSeconds' => $slotDurationInSec,
         ]);
     }
 
@@ -77,14 +87,14 @@ class CalendarController extends Controller
                     $shopBreakEnd = strtotime($openHours['break_end']);
 
                     $currentTime = max($scheduleStart, strtotime($openHours['open']));
-                    while ($currentTime + 3600 <= min($scheduleEnd, strtotime($openHours['close']))) {
+                    while ($currentTime + $this->slotDurationInSec <= min($scheduleEnd, strtotime($openHours['close']))) {
                         // Vérifier si le créneau n'est pas pendant la pause de l'employé
                         $isDuringAbsence = false;
                         foreach ($absences as $absence) {
                             $absenceStart = Carbon::parse($absence->start_time)->format('Y-m-d H:i');
                             $absenceEnd = Carbon::parse($absence->end_time)->format('Y-m-d H:i');
                             $slotStart = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime);
-                            $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + 3600);
+                            $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + $this->slotDurationInSec );
 
                             if ($this->doSlotsOverlap($slotStart, $slotEnd, $absenceStart, $absenceEnd)) {
                                 $isDuringAbsence = true;
@@ -93,15 +103,15 @@ class CalendarController extends Controller
                         }
 
                         if ($isDuringAbsence) {
-                            $currentTime += 3600;
+                            $currentTime += $this->slotDurationInSec ;
                             continue;
                         }
 
-                        if ($currentTime + 3600 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
+                        if ($currentTime + $this->slotDurationInSec  <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                             // Vérifier si le créneau n'est pas pendant la pause du salon
-                            if ($currentTime + 3600 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
+                            if ($currentTime + $this->slotDurationInSec  <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
                                 $slotStart = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime);
-                                $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + 3600);
+                                $slotEnd = $startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime + $this->slotDurationInSec );
 
                                 $isSlotReserved = false;
                                 foreach ($appointmentSlots as $appointmentSlot) {
@@ -141,7 +151,7 @@ class CalendarController extends Controller
                                 ];
                             }
                         }
-                        $currentTime += 3600;
+                        $currentTime += $this->slotDurationInSec ;
                     }
                 }
             }

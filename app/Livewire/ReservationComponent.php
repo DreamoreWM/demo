@@ -34,6 +34,26 @@ class ReservationComponent extends Component
 
     public $selectedSlot = null;
 
+    public $slotDuration;
+    public $slotDurationInMinutes;
+    public $slotDurationInSecondes;
+
+
+    public function mount()
+    {
+        $slotDurationInMinutes = SalonSetting::first()->slot_duration;
+        $slotDuration = gmdate("H:i", $slotDurationInMinutes * $slotDurationInMinutes);
+        $slotDurationInSec = $slotDurationInMinutes * $slotDurationInMinutes;
+
+        $this->slotDuration = $slotDuration;
+        $this->slotDurationInMinutes = $slotDurationInMinutes;
+        $this->slotDurationInSecondes = $slotDurationInSec;
+        $this->prestations = Prestation::all();
+        $this->employees = Employee::all();
+        $this->setting = SalonSetting::first();
+        $this->openDays = json_decode($this->setting->open_days, true);
+    }
+
     public function confirmReservation($date, $start)
     {
         // Récupérer les prestations sélectionnées
@@ -219,16 +239,6 @@ class ReservationComponent extends Component
         return $slot1['start']->lte($slot2['end']) && $slot1['end']->gte($slot2['start']);
     }
 
-
-
-    public function mount()
-    {
-        $this->prestations = Prestation::all();
-        $this->employees = Employee::all();
-        $this->setting = SalonSetting::first();
-        $this->openDays = json_decode($this->setting->open_days, true);
-    }
-
     public function updatedSelectedPrestations()
     {
         $this->getAvailableSlots();
@@ -273,11 +283,11 @@ class ReservationComponent extends Component
                         $shopBreakEnd = strtotime($openHours['break_end']);
 
                         $currentTime = max($scheduleStart, strtotime($openHours['open']));
-                        while ($currentTime + $totalDuration * 60 <= min($scheduleEnd, strtotime($openHours['close']))) {
+                        while ($currentTime + $totalDuration * $this->slotDurationInMinutes <= min($scheduleEnd, strtotime($openHours['close']))) {
                             // Vérifier si le créneau n'est pas pendant la pause de l'employé
-                            if ($currentTime + $totalDuration * 60 <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
+                            if ($currentTime + $totalDuration * $this->slotDurationInMinutes <= $scheduleBreakStart || $currentTime >= $scheduleBreakEnd) {
                                 // Vérifier si le créneau n'est pas pendant la pause du salon
-                                if ($currentTime + $totalDuration * 60 <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
+                                if ($currentTime + $totalDuration * $this->slotDurationInMinutes <= $shopBreakStart || $currentTime >= $shopBreakEnd) {
                                     $startDatetime = new DateTime($startDate->format('Y-m-d') . ' ' . date('H:i', $currentTime));
                                     $endDatetime = clone $startDatetime;
                                     $endDatetime->add(new DateInterval('PT' . $totalDuration . 'M'));
@@ -285,7 +295,7 @@ class ReservationComponent extends Component
                                     // Vérifier si le créneau est disponible
                                     if ($this->isSlotAvailable($startDatetime, $endDatetime, $this->selectedEmployee)) {
                                         $slotStart = date('H:i', $currentTime);
-                                        $slotEnd = date('H:i', $currentTime + $totalDuration * 60);
+                                        $slotEnd = date('H:i', $currentTime + $totalDuration * $this->slotDurationInMinutes);
                                         $this->availableSlots[] = [
                                             'start' => $slotStart,
                                             'end' => $slotEnd,
@@ -294,7 +304,7 @@ class ReservationComponent extends Component
                                     }
                                 }
                             }
-                            $currentTime += 3600;
+                            $currentTime += ($this->slotDurationInMinutes * 60);
                         }
                     }
                 }
