@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Photospres;
 use App\Models\Review;
 use App\Models\SalonSetting;
 use Illuminate\Http\Request;
@@ -12,13 +13,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $photos = Photospres::all();
         $facebookPageUrl = SalonSetting::first()->facebook_page_url;
         $json = SalonSetting::first()->open_days;
         $openDays = json_decode($json, true);
         $isOpen = $this->isOpen();
         $categories = Category::with('prestations')->get();
         $reviews = Review::with('appointment.bookable')->with('photo')->get();
-        return view('dashboard', compact('categories', 'reviews', 'isOpen', 'facebookPageUrl', 'openDays'));
+        return view('dashboard', compact('categories', 'reviews', 'isOpen', 'facebookPageUrl', 'openDays', 'photos'));
     }
 
     public function isOpen()

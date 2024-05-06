@@ -158,11 +158,6 @@
         opacity: 8%;
     }
 
-    footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
     .content {
         display: flex;
         flex-direction: column;
@@ -176,7 +171,7 @@
         /* Définissez une hauteur fixe ou utilisez flexbox/grid pour définir la hauteur */
         margin: 0; /* Reset margin */
         padding: 0;
-        height: 95vh;
+        height: 105vh;
     }
 
     @media (max-height: 580px) {
@@ -196,8 +191,27 @@
         transform: translateY(1px); /* Déplace légèrement le bouton vers le bas pour l'effet de clic */
     }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<style>
+    .swiper {
+        width: 600px;
+        height: 300px;
+    }
 
+    .swiper-button-next {
+        margin-left: 10px; /* Ajustez cette valeur selon vos besoins */
+    }
+
+    .swiper-button-prev {
+        margin-right: 10px; /* Ajustez cette valeur selon vos besoins */
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <x-app-layout>
 
     <div id="loader" class="loader"></div>
@@ -257,7 +271,7 @@
 
                         <div style="display: flex; align-items: center; padding-bottom: 10px">
                             <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
-                            <div style="padding: 0 7px; font-weight: bold">Nos horaires</div>
+                            <div style="padding: 0 7px; font-weight: bold; font-size: 15px">Nos horaires</div>
                             <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
                         </div>
 
@@ -276,6 +290,13 @@
                                 </div>
                             </ul>
                         @endforeach
+
+                        <div style="display: flex; align-items: center; padding-top: 10px">
+                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                            <div style="padding: 0 7px; font-weight: bold; font-size: 15px">01 23 45 67 89</div>
+                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                        </div>
+
                     </div>
 
                     <div>
@@ -293,10 +314,10 @@
                 <div class="mx-auto max-w-screen-lg px-4 lg:px-12">
                     <div class="mb-4 d-flex justify-content-center">
                         <div class="col pb-10">
-                            <h2 class=" pt-10 text-center font-bold" data-aos="fade-down" data-aos-offset="250">LES TARIFS</h2>
+                            <h2 class=" pt-10 text-center font-bold" data-aos="fade-down" style="font-size: 25px">Les tarifs</h2>
                             <div class="row">
                                 @foreach($categories as $category)
-                                    <div class="col-md-6" data-aos="fade-up" data-aos-offset="450">
+                                    <div class="col-md-6" data-aos="fade-up" data-aos-offset="100">
                                         <div class="card mt-4 border-0 bg-transparent">
                                             <div class="card-header bg-transparent">
                                                 <h3 class="text-left font-bold">{{ strtoupper($category->name) }}</h3>
@@ -319,42 +340,42 @@
             </section>
         </div>
 
-        <div class="portfolio" data-aos="fade-right" data-aos-offset="250">
+        <div class="portfolio" data-aos="fade-right" data-aos-offset="150">
+            <h2 class=" p-10 text-center font-bold" data-aos="fade-down" style="font-size: 25px; color: white; backdrop-filter: blur(60px); ">Nos réalisations</h2>
             <div class="container-fluid tm-container-content" >
                 <div class="row tm-gallery pt-5" style="justify-content: center !important">
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5"  data-aos="fade-up" data-aos-offset="450">
-                        <figure class="effect-ming tm-video-item">
-                            <img src="img/img-14.jpg" alt="Image" class="img-fluid">
-                            <figcaption class="d-flex align-items-center justify-content-center">
-                                <h2>Sea</h2>
-                                <a href="photo-detail.html">View more</a>
-                            </figcaption>
-                        </figure>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5"  data-aos="fade-up" data-aos-offset="450">
-                        <figure class="effect-ming tm-video-item">
-                            <img src="img/img-15.jpg" alt="Image" class="img-fluid">
-                            <figcaption class="d-flex align-items-center justify-content-center">
-                                <h2>Turtle</h2>
-                                <a href="photo-detail.html">View more</a>
-                            </figcaption>
-                        </figure>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5"  data-aos="fade-up"  data-aos-offset="450">
-                        <figure class="effect-ming tm-video-item">
-                            <img src="img/img-16.jpg" alt="Image" class="img-fluid">
-                            <figcaption class="d-flex align-items-center justify-content-center">
-                                <h2>Peace</h2>
-                                <a href="photo-detail.html">View more</a>
-                            </figcaption>
-                        </figure>
-                    </div>
+                        <div class="swiper">
+                            <!-- Additional required wrapper -->
+                            <div class="swiper-wrapper">
+                                @foreach($photos as $photo)
+                                    <div class="swiper-slide">
+                                        <figure class="effect-ming tm-video-item">
+                                            <img src="{{ asset('storage/' . $photo->path) }}" alt="Image" class="img-fluid" style="width: 100%; height: 260px; object-fit: cover;">
+                                            <figcaption class="d-flex align-items-center justify-content-center">
+                                                <h2>Image</h2>
+                                                <a href="photo-detail.html">View more</a>
+                                            </figcaption>
+                                        </figure>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <!-- If we need pagination -->
+                            <div class="swiper-pagination"></div>
+
+                            <!-- If we need navigation buttons -->
+                            <div class="swiper-button-prev"></div>
+                            <div class="swiper-button-next"></div>
+
+                            <!-- If we need scrollbar -->
+                            <div class="swiper-scrollbar"></div>
+                        </div>
                 </div> <!-- row -->
             </div>
         </div>
 
-        <div class="info" data-aos="fade-down" data-aos-offset="250">
+        <div class="info" data-aos="fade-down" data-aos-offset="250" style="padding-bottom: 30px">
             <section>
+                <h2 class=" pt-5 pb-5 text-center font-bold" data-aos="fade-down" style="font-size: 25px">Nos coordonnées</h2>
                 <div class="mx-auto max-w-screen-lg px-4 lg:px-12">
                     <div class="mb-4">
                         <div class="col">
@@ -430,10 +451,60 @@
             </div>
         </div>
 
+        <footer style="background-color: #767473; padding: 10px; text-align: center; border-top: 1px solid #e7e7e7;">
+            <div style="margin-bottom: 20px;">
+                <a href="/about" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">À propos</a>
+                <a href="/services" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">Services</a>
+                <a href="/contact" style="text-decoration: none; color: #FFFFFF;">Contact</a>
+            </div>
+            <div>
+                <p style="margin: 0; color: #E2E2E2;">© 2024 MonSiteWeb. Tous droits réservés.</p>
+                <p style="margin: 0; color: #E2E2E2;">contact@monsiteweb.com | +33 1 23 45 67 89</p>
+            </div>
+        </footer>
 
     </div>
 
 
+    <script>
+        const swiper = new Swiper('.swiper', {
+            // Optional parameters
+            direction: 'horizontal',
+            loop: true,
+
+            // If we need pagination
+            pagination: {
+                el: '.swiper-pagination',
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+
+            // And if we need scrollbar
+            scrollbar: {
+                el: '.swiper-scrollbar',
+            },
+
+            effect: 'coverflow',
+
+            slidesPerView: 3, // Adjust this value according to your needs
+
+            // Enable centered slides
+            centeredSlides: true,
+
+            // Customize the coverflow effect
+            coverflowEffect: {
+                rotate: 50, // Slide rotate in degrees
+                stretch: 0, // Stretch space between slides (in px)
+                depth: 100, // Depth offset in px (slides translate in Z axis)
+                modifier: 1, // Effect multipler
+                slideShadows: true, // Enables slides shadows
+            },
+        });
+    </script>
 
     <script>
         window.onload = function() {
@@ -449,16 +520,6 @@
 
 
 
-    {{--    <footer style="background-color: #767473; padding: 10px; text-align: center; border-top: 1px solid #e7e7e7;">--}}
-{{--        <div style="margin-bottom: 10px;">--}}
-{{--            <a href="/about" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">À propos</a>--}}
-{{--            <a href="/services" style="margin-right: 15px; text-decoration: none; color: #FFFFFF;">Services</a>--}}
-{{--            <a href="/contact" style="text-decoration: none; color: #FFFFFF;">Contact</a>--}}
-{{--        </div>--}}
-{{--        <div>--}}
-{{--            <p style="margin: 0; color: #E2E2E2;">© 2024 MonSiteWeb. Tous droits réservés.</p>--}}
-{{--            <p style="margin: 0; color: #E2E2E2;">contact@monsiteweb.com | +33 1 23 45 67 89</p>--}}
-{{--        </div>--}}
-{{--    </footer>--}}
+
 </x-app-layout>
 
