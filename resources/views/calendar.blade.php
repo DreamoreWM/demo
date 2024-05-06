@@ -165,6 +165,9 @@
         }
     </style>
     <div class="container-fluid pt-3">
+        <input type="hidden" name="slotDuration" id="slotDuration">
+        <input type="hidden" name="slotDurationInMinutes" id="slotDurationInMinutes">
+        <input type="hidden" name="slotDurationInSeconds" id="slotDurationInSeconds">
         <div class="row">
             <!-- Sidebar pour les filtres avec fond blanc et espace interne -->
             <!-- Sidebar pour les filtres avec fond blanc, bords arrondis, et espace interne -->
@@ -413,12 +416,14 @@
                 let modal = document.getElementById('appointmentModal');
                 modal.style.display = 'none';
             });
+            const slotDuration = document.getElementById('slotDuration');;
+            const slotDurationInMinutes = document.getElementById('slotDurationInMinutes');
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '20:00:00',
-                slotLabelInterval: '01:00',
+                slotLabelInterval: slotDuration,
                 eventClick: function(info) {
 
                     const selectedEmployee = document.getElementById('selectedEmployee');
@@ -638,7 +643,7 @@
 
                 // Calculer la durée totale des prestations sélectionnées
                 const totalPrestationDurationMinutes = selectedPrestations.reduce((total, current) => total + current, 0);
-                const slotsNeeded = Math.ceil(totalPrestationDurationMinutes / 60); // Chaque créneau dure 60 minutes
+                const slotsNeeded = Math.ceil(totalPrestationDurationMinutes / slotDurationInMinutes); // Chaque créneau dure 60 minutes
 
 
                 let availableSlots = [];
