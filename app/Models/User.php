@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->morphMany(Appointment::class, 'bookable');
     }
 
+    public function isAdmin()
+    {
+        return $this->role == 'admin'; // ou toute autre logique que vous utilisez pour déterminer si un utilisateur est un administrateur
+    }
+
 
 
 }
