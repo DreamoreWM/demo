@@ -16,6 +16,9 @@
                     <x-nav-link :href="route('dashboard.index')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @if(Auth::user()->role == 'admin')
+
                         <!-- Affichez ce lien seulement si l'utilisateur est connecté -->
                         <x-nav-link :href="route('employees.index')" :active="request()->routeIs('employees.*')">
                             {{ __('Coiffeurs') }}
@@ -38,6 +41,8 @@
                         <x-nav-link :href="route('photos.index')" :active="request()->routeIs('photos.*')">
                             {{ __('Photos') }}
                         </x-nav-link>
+
+                    @endif
                     <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
                         @if(!Auth::check())
                             <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</a>
