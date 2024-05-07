@@ -3,6 +3,44 @@
 
 <style>
 
+    .btn-booking {
+        position: relative;
+        display: inline-block;
+        padding: 12px 36px;
+        margin: 10px 0;
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 18px;
+        letter-spacing: 2px;
+        border-radius: 40px;
+        overflow: hidden;
+        background: linear-gradient(90deg,#0162c8,#55e7fc);
+    }
+    .effect{
+        position: absolute;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        border-radius: 50%;
+        animation: animate 1s linear infinite;
+    }
+
+    @keyframes animate {
+        0%{
+            width: 0px;
+            height: 0px;
+            opacity: 0.5;
+        }
+        100%{
+            width: 500px;
+            height: 500px;
+            opacity: 0;
+        }
+    }
+
+
+
     .loader {
         top: 50vh !important;
         bottom: 0;
@@ -179,17 +217,7 @@
             height: auto;
         }
     }
-    .booking-btn:hover {
-        background-color: #45a049; /* Un peu plus foncé que le couleur du bouton */
-        box-shadow: 0 2px #666; /* Ombre plus proche pour effet au survol */
-        transform: translateY(-2px); /* Déplace légèrement le bouton vers le haut pour l'effet de clic */
-    }
 
-    .booking-btn:active {
-        background-color: #3e8e41; /* Encore plus foncé pour l'effet de clic */
-        box-shadow: 0 1px #666; /* Ombre très proche pour l'effet de clic */
-        transform: translateY(1px); /* Déplace légèrement le bouton vers le bas pour l'effet de clic */
-    }
 </style>
 <style>
     .swiper {
@@ -246,15 +274,36 @@
 
                     </div>
                     @if(Auth::check())
-                        <a href="{{ route('appointments.create') }}" class="booking-btn" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-weight: bold; border-radius: 5px; box-shadow: 0 4px #999; transition: all 0.3s; margin-top: 20px;">
+                        <a href="{{ route('appointments.create') }}" class="btn-booking">
                             Prendre Rendez-Vous
                         </a>
                     @else
                         <!-- Bouton qui ouvre la modal pour les utilisateurs non connectés -->
-                        <button class="booking-btn" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-weight: bold; border-radius: 5px; box-shadow: 0 4px #999; transition: all 0.3s; margin-top: 20px;" data-toggle="modal" data-target="#loginModal">
+                        <a class="btn-booking" data-toggle="modal" data-target="#loginModal">
                             Prendre un rendez-vous
-                        </button>
+                        </a>
                     @endif
+
+
+                    <script type="text/javascript">
+                        const buttons = document.querySelectorAll('.btn-booking');
+                        buttons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                let x = e.clientX - e.target.offsetLeft;
+                                let y = e.clientY - e.target.offsetTop;
+
+                                let ripples = document.createElement('span');
+                                ripples.classList.add('effect');
+                                ripples.style.left = x + 'px';
+                                ripples.style.top = y + 'px';
+                                this.appendChild(ripples);
+
+                                setTimeout(() => {
+                                    ripples.remove()
+                                }, 1000);
+                            });
+                        });
+                    </script>
 
                     <div style="
     font-size: 10px;
@@ -383,7 +432,7 @@
                                 <div class="col-md-6" data-aos="fade-right" >
                                     <div class="card border-0 bg-transparent">
                                         <div class="card-body">
-                                            <iframe src="https://maps.google.com/maps?q=4+rue+du+téléphone+59%2670+croix+france&output=embed" width="100%" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                                            <iframe src="https://maps.google.com/maps?q={{$address}}&output=embed" width="100%" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
                                         </div>
                                     </div>
                                 </div>

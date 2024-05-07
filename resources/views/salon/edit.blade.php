@@ -26,6 +26,7 @@
                         <div class="mb-3">
                             <label for="address" class="form-label">Adresse</label>
                             <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $setting->address) }}" placeholder="Adresse">
+                            <div id="address-list" class="form-control" style="display: none;"></div>
                         </div>
 
                         <div class="mb-3">
@@ -61,5 +62,36 @@
             </div>
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var addressInput = document.getElementById('address');
+            var addressList = document.getElementById('address-list');
+
+            addressInput.addEventListener('focus', function() {
+                addressList.style.display = 'block';
+            });
+
+            addressInput.addEventListener('keyup', function() {
+                var query = this.value;
+                if (query.length > 2) {
+                    fetch('https://api-adresse.data.gouv.fr/search/?q=' + query)
+                        .then(response => response.json())
+                        .then(data => {
+                            addressList.innerHTML = '';
+                            data.features.forEach(function(feature) {
+                                var div = document.createElement('div');
+                                div.textContent = feature.properties.label;
+                                div.addEventListener('click', function() {
+                                    addressInput.value = this.textContent;
+                                    addressList.style.display = 'none';
+                                });
+                                addressList.appendChild(div);
+                            });
+                        });
+                }
+            });
+        });
+    </script>
 
 @endsection

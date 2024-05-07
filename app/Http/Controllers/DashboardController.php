@@ -16,11 +16,12 @@ class DashboardController extends Controller
         $photos = Photospres::all();
         $facebookPageUrl = SalonSetting::first()->facebook_page_url;
         $json = SalonSetting::first()->open_days;
+        $address = SalonSetting::first()->address;
         $openDays = json_decode($json, true);
         $isOpen = $this->isOpen();
         $categories = Category::with('prestations')->get();
         $reviews = Review::with('appointment.bookable')->with('photo')->get();
-        return view('dashboard', compact('categories', 'reviews', 'isOpen', 'facebookPageUrl', 'openDays', 'photos'));
+        return view('dashboard', compact('categories', 'reviews', 'isOpen', 'facebookPageUrl', 'openDays', 'photos', 'address'));
     }
 
     public function isOpen()
