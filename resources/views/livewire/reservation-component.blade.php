@@ -94,34 +94,37 @@
                     <div class="mb-4 d-flex justify-content-center bg-white rounded-lg shadow">
                         <div class="col">
                             @if(count($selectedPrestations) === 0 || $showAddPrestationDiv)
-                                @foreach ($prestations as $prestation)
-                                    @if (!in_array($prestation->id, $selectedPrestations))
-                                        <div class="card m-3">
-                                            <div class="card-body d-flex justify-content-between">
-                                                <h5 class="card-title">{{ $prestation->nom }}</h5>
-                                                <div class="d-flex" style="color: gray">
-                                                    <p>{{ $prestation->temps }} min</p>
-                                                    <p class="ml-2 mr-2"> • </p>
-                                                    <p style="font-weight: bold;">{{ $prestation->prix }} €</p>
-                                                    <button wire:click="togglePrestation({{ $prestation->id }})" class="btn btn-primary ml-5">Sélectionner</button>
+                                @foreach ($categories as $categorie)
+                                    <div class="accordion" id="accordionPrestations{{ $categorie->id }}">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading{{ $categorie->id }}">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $categorie->id }}" aria-expanded="false" aria-controls="collapse{{ $categorie->id }}">
+                                                    {{ $categorie->name }}
+                                                </button>
+                                            </h2>
+                                            <div id="collapse{{ $categorie->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $categorie->id }}" data-bs-parent="#accordionPrestations{{ $categorie->id }}">
+                                                <div class="accordion-body">
+                                                    @foreach ($categorie->prestations as $prestation)
+                                                        @if (!in_array($prestation->id, $selectedPrestations))
+                                                            <div class="card m-3">
+                                                                <div class="card-body d-flex justify-content-between">
+                                                                    <h5 class="card-title">{{ $prestation->nom }}</h5>
+                                                                    <div class="d-flex" style="color: gray">
+                                                                        <p>{{ $prestation->temps }} min</p>
+                                                                        <p class="ml-2 mr-2"> • </p>
+                                                                        <p style="font-weight: bold;">{{ $prestation->prix }} €</p>
+                                                                        <button wire:click="togglePrestation({{ $prestation->id }})" class="btn btn-primary ml-5">Sélectionner</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
+                                    </div>
                                 @endforeach
                             @endif
-
-
-
-
-
-
-
-
-
-
-
-
 
                             @if(count($selectedPrestations) !== 0 || $showAddPrestationDiv)
 
@@ -131,6 +134,7 @@
                                                 @foreach ($this->getSelectedPrestations() as $index => $prestation)
                                                     <div class="card-body d-flex justify-content-between border-none ml-10 mr-20 mt-8 mb-2">
                                                         <div class="font-bold">
+                                                            <p>{{ $prestation['categorie'] }}</p>
                                                             <p>{{ $prestation['name'] }}</p>
                                                             <p class="text-gray-400">{{ $prestation['temps'] }} min<span class="ml-2 mr-2"> • </span> {{ $prestation['prix'] }} €</p>
                                                         </div>
