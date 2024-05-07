@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Absence;
 use App\Models\Appointment;
+use App\Models\Category;
 use App\Models\EmployeeSchedule;
 use App\Models\SalonSetting;
 use App\Models\User;
@@ -38,13 +39,15 @@ class ReservationComponent extends Component
     public $slotDurationInMinutes;
     public $slotDurationInSecondes;
 
+    public $categories;
+
 
     public function mount()
     {
         $slotDurationInMinutes = SalonSetting::first()->slot_duration;
         $slotDuration = gmdate("H:i", $slotDurationInMinutes * $slotDurationInMinutes);
         $slotDurationInSec = $slotDurationInMinutes * $slotDurationInMinutes;
-
+        $this->categories = Category::with('prestations')->get();
         $this->slotDuration = $slotDuration;
         $this->slotDurationInMinutes = $slotDurationInMinutes;
         $this->slotDurationInSecondes = $slotDurationInSec;
@@ -339,12 +342,14 @@ class ReservationComponent extends Component
     {
         $selectedPrestations = [];
         foreach ($this->selectedPrestations as $prestationId) {
+            $nameCategorie = Category::find(Prestation::find($prestationId)->category_id)->name;
             $prestation = Prestation::find($prestationId);
             $selectedPrestations[] = [
                 'id' => $prestation->id,
                 'name' => $prestation->nom,
                 'temps' => $prestation->temps,
                 'prix' => $prestation->prix,
+                'categorie' => $nameCategorie,
             ];
         }
         return $selectedPrestations;
