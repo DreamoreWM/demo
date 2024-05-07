@@ -420,6 +420,15 @@
             const slotDurationInMinutes = document.getElementById('slotDurationInMinutes');
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr',
+                buttonText: {
+                    today: 'aujourd\'hui',
+                    month: 'mois',
+                    week: 'semaine',
+                    day: 'jour',
+                    list: 'liste'
+                },
+                allDayText: '',
                 initialView: 'timeGridWeek',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '20:00:00',

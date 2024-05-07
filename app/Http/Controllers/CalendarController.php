@@ -124,7 +124,7 @@ class CalendarController extends Controller
 
                                 $events[] = [
                                     'id' => $appointment->id ?? null,
-                                    'title' => $isSlotReserved ? 'Reserved' : 'Available',
+                                    'title' => $employee->name,
                                     'start' => $slotStart,
                                     'end' => $slotEnd,
                                     'start_time' => $isSlotReserved ? Carbon::parse($appointment->start_time)->format('H:i:s') : null,
