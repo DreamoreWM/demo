@@ -165,9 +165,9 @@
         }
     </style>
     <div class="container-fluid pt-3">
-        <input type="hidden" name="slotDuration" id="slotDuration">
-        <input type="hidden" name="slotDurationInMinutes" id="slotDurationInMinutes">
-        <input type="hidden" name="slotDurationInSeconds" id="slotDurationInSeconds">
+        <input type="hidden" name="slotDuration" id="slotDuration" value="{{ $slotDuration }}">
+        <input type="hidden" name="slotDurationInMinutes" id="slotDurationInMinutes" value="{{ $slotDurationInMinutes }}">
+        <input type="hidden" name="slotDurationInSeconds" id="slotDurationInSeconds" value="{{ $slotDurationInSeconds }}">
         <div class="row">
             <!-- Sidebar pour les filtres avec fond blanc et espace interne -->
             <!-- Sidebar pour les filtres avec fond blanc, bords arrondis, et espace interne -->
@@ -424,8 +424,8 @@
                 let modal = document.getElementById('appointmentModal');
                 modal.style.display = 'none';
             });
-            const slotDuration = document.getElementById('slotDuration');;
-            const slotDurationInMinutes = document.getElementById('slotDurationInMinutes');
+            const slotDuration = document.getElementById('slotDuration').value;
+            const slotDurationInMinutes = document.getElementById('slotDurationInMinutes').value;
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: 'fr',
@@ -704,6 +704,7 @@
                 calendar.render();
             }
 
+            // Gestionnaire d'événements pour le champ de recherche
             const searchPrestationInput = document.getElementById('searchPrestation');
             searchPrestationInput.addEventListener('keyup', function() {
                 const searchTerm = this.value.toLowerCase();
