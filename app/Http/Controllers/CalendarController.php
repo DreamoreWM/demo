@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Absence;
 use App\Models\Appointment;
+use App\Models\Category;
 use App\Models\Employee;
 use App\Models\EmployeeSchedule;
 use App\Models\Prestation;
@@ -17,8 +18,11 @@ class CalendarController extends Controller
 {
     public $slotDurationInMinutes;
     public $slotDurationInSec;
+
+    public $categories;
     public function index()
     {
+        $this->categories = Category::all();
         $appointments = Appointment::all();
         $employees = Employee::all();
         $prestations = Prestation::all();
@@ -44,6 +48,7 @@ class CalendarController extends Controller
             'slotDuration' => $slotDuration,
             'slotDurationInMinutes' => $slotDurationInMinutes,
             'slotDurationInSeconds' => $slotDurationInSec,
+            'categories' => $this->categories,
         ]);
     }
 
