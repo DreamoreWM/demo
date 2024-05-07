@@ -165,9 +165,9 @@
         }
     </style>
     <div class="container-fluid pt-3">
-        <input type="hidden" name="slotDuration" id="slotDuration">
-        <input type="hidden" name="slotDurationInMinutes" id="slotDurationInMinutes">
-        <input type="hidden" name="slotDurationInSeconds" id="slotDurationInSeconds">
+        <input type="hidden" name="slotDuration" id="slotDuration" value="{{ $slotDuration }}">
+        <input type="hidden" name="slotDurationInMinutes" id="slotDurationInMinutes" value="{{ $slotDurationInMinutes }}">
+        <input type="hidden" name="slotDurationInSeconds" id="slotDurationInSeconds" value="{{ $slotDurationInSeconds }}">
         <div class="row">
             <!-- Sidebar pour les filtres avec fond blanc et espace interne -->
             <!-- Sidebar pour les filtres avec fond blanc, bords arrondis, et espace interne -->
@@ -192,6 +192,14 @@
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                     </div>
                 </div>
+                <div class="input-group mb-3">
+                    <select id="categorySelect" class="form-control">
+                        <option value="">Toutes les catégories</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <!-- Container pour les prestations avec scroll, fond blanc, et bords arrondis -->
                 <div id="prestation" class="bg-white rounded shadow p-3" style="max-height: 600px; overflow-y: auto;">
                     <!-- Avant la liste des prestations -->
@@ -199,7 +207,7 @@
 
                     <div id="prestationsCards" class="d-flex flex-column">
                         @foreach($prestations as $prestation)
-                            <div class="card" style="margin-bottom: 10px;">
+                            <div class="card" data-category-id="{{ $prestation->category_id }}" style="margin-bottom: 10px;">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $prestation->nom }}</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">{{ $prestation->temps }} minutes</h6>
@@ -416,8 +424,8 @@
                 let modal = document.getElementById('appointmentModal');
                 modal.style.display = 'none';
             });
-            const slotDuration = document.getElementById('slotDuration');;
-            const slotDurationInMinutes = document.getElementById('slotDurationInMinutes');
+            const slotDuration = document.getElementById('slotDuration').value;
+            const slotDurationInMinutes = document.getElementById('slotDurationInMinutes').value;
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: 'fr',
@@ -696,6 +704,7 @@
                 calendar.render();
             }
 
+            // Gestionnaire d'événements pour le champ de recherche
             const searchPrestationInput = document.getElementById('searchPrestation');
             searchPrestationInput.addEventListener('keyup', function() {
                 const searchTerm = this.value.toLowerCase();
@@ -704,6 +713,21 @@
                 prestations.forEach(function(prestation) {
                     const title = prestation.querySelector('.card-title').textContent.toLowerCase();
                     if(title.includes(searchTerm)) {
+                        prestation.style.display = '';
+                    } else {
+                        prestation.style.display = 'none';
+                    }
+                });
+            });
+
+            document.getElementById('categorySelect').addEventListener('change', function() {
+                const selectedCategoryId = this.value;
+                const prestations = document.querySelectorAll('#prestationsCards .card');
+
+                prestations.forEach(function(prestation) {
+                    const prestationCategoryId = prestation.getAttribute('data-category-id');
+
+                    if (selectedCategoryId === '' || prestationCategoryId === selectedCategoryId) {
                         prestation.style.display = '';
                     } else {
                         prestation.style.display = 'none';
