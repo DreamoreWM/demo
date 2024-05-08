@@ -29,18 +29,18 @@
                         <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
                             {{ __('Calendrier') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('appointments.create')" :active="request()->routeIs('appointments.*')">
-                            {{ __('Prendre rendez-vous') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('salon.edit')" :active="request()->routeIs('salon.*')">
-                            {{ __('Paramétres') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('absences.index')" :active="request()->routeIs('absences.*')">
-                            {{ __('Absences') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('photos.index')" :active="request()->routeIs('photos.*')">
-                            {{ __('Photos') }}
-                        </x-nav-link>
+{{--                        <x-nav-link :href="route('appointments.create')" :active="request()->routeIs('appointments.*')">--}}
+{{--                            {{ __('Prendre rendez-vous') }}--}}
+{{--                        </x-nav-link>--}}
+{{--                        <x-nav-link :href="route('salon.edit')" :active="request()->routeIs('salon.*')">--}}
+{{--                            {{ __('Paramétres') }}--}}
+{{--                        </x-nav-link>--}}
+{{--                        <x-nav-link :href="route('absences.index')" :active="request()->routeIs('absences.*')">--}}
+{{--                            {{ __('Absences') }}--}}
+{{--                        </x-nav-link>--}}
+{{--                        <x-nav-link :href="route('photos.index')" :active="request()->routeIs('photos.*')">--}}
+{{--                            {{ __('Photos') }}--}}
+{{--                        </x-nav-link>--}}
 
                     @endif
                     <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">

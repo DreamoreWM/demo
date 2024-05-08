@@ -3,6 +3,13 @@
 
 <style>
 
+    .map-responsive iframe {
+        left:0;
+        top:0;
+        height:100%;
+        width:100%;
+    }
+
     .btn-booking {
         position: relative;
         display: inline-block;
@@ -80,6 +87,12 @@
         background-attachment: fixed;
         justify-content: center;
         align-items: center;
+    }
+
+    .review {
+        justify-content: center;
+        align-items: center;
+        background-color: #9d9d9d;
     }
 
     .info {
@@ -204,19 +217,12 @@
         background-image: url('/images/background-home.webp');
         background-size: cover; /* Couvre toute la zone disponible sans redimensionner l'image */
         background-position: center;
-        background-repeat: no-repeat; /* Empêche la répétition de l'image */
-        background-attachment: fixed; /* Fixe l'arrière-plan par rapport à la fenêtre du navigateur */
-        /* Définissez une hauteur fixe ou utilisez flexbox/grid pour définir la hauteur */
+        background-repeat: no-repeat; /* Empêche la répétition de l'image */ /* Définissez une hauteur fixe ou utilisez flexbox/grid pour définir la hauteur */
         margin: 0; /* Reset margin */
         padding: 0;
         height: 105vh;
     }
 
-    @media (max-height: 580px) {
-        .content {
-            height: auto;
-        }
-    }
 
 </style>
 <style>
@@ -231,6 +237,13 @@
 
     .swiper-button-prev {
         margin-right: 10px; /* Ajustez cette valeur selon vos besoins */
+    }
+</style>
+<style>
+    @media (max-width: 768px) {
+        .flex-container {
+            flex-direction: column;
+        }
     }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
@@ -260,102 +273,115 @@
                     </div>
                 @endif
                 <div class="home" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <div style="background: rgba(255, 255, 255, 0.8); margin-top: 4vmin; padding: 15px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center;">
-                        <img src="/images/logo.png" alt="Logo Salon de Coiffure" style="max-width: 160px;"> <!-- Ajustez max-width en fonction de la taille réelle de votre logo -->
-                    </div>
-                    {{--                @if($isOpen)--}}
-                    {{--                    <img src="/images/open.png" alt="Logo ouvert" style="max-width: 160px;"> <!-- Ajustez max-width en fonction de la taille réelle de votre logo -->--}}
 
-                    {{--                @else--}}
-                    {{--                    <img src="/images/close.png" alt="Logo fermé" style="max-width: 160px;"> <!-- Ajustez max-width en fonction de la taille réelle de votre logo -->--}}
+                    <div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center;">
 
-                    {{--                @endif--}}
-                    <div>
+                        <!-- First set of hours -->
+                        <div style="font-size: 10px; font-weight: bold; color: white; min-width: 300px; padding: 10px; margin: 2vmin; border-radius: 15px; backdrop-filter: blur(60px); -webkit-backdrop-filter: blur(60px); box-shadow: 0px 4px 14px 0px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: space-around; flex-wrap: wrap;">
 
-                    </div>
-                    @if(Auth::check())
-                        <a href="{{ route('appointments.create') }}" class="btn-booking">
-                            Prendre Rendez-Vous
-                        </a>
-                    @else
-                        <!-- Bouton qui ouvre la modal pour les utilisateurs non connectés -->
-                        <a class="btn-booking" data-toggle="modal" data-target="#loginModal">
-                            Prendre un rendez-vous
-                        </a>
-                    @endif
+                            <a href="https://www.tiktok.com" target="_blank">
+                                <img src="/images/tiktok.png" alt="TikTok" style="width: 30px; height: 30px;">
+                            </a>
 
+                            <a href="https://www.snapchat.com" target="_blank">
+                                <img src="/images/snap.png" alt="Snapchat" style="width: 30px; height: 30px;">
+                            </a>
 
-                    <script type="text/javascript">
-                        const buttons = document.querySelectorAll('.btn-booking');
-                        buttons.forEach(button => {
-                            button.addEventListener('click', function(e) {
-                                let x = e.clientX - e.target.offsetLeft;
-                                let y = e.clientY - e.target.offsetTop;
+                            <a href="https://www.facebook.com" target="_blank">
+                                <img src="/images/facebook.png" alt="Facebook" style="width: 30px; height: 30px;">
+                            </a>
 
-                                let ripples = document.createElement('span');
-                                ripples.classList.add('effect');
-                                ripples.style.left = x + 'px';
-                                ripples.style.top = y + 'px';
-                                this.appendChild(ripples);
+                            <a href="https://www.whatsapp.com" target="_blank">
+                                <img src="/images/whatsapp.png" alt="WhatsApp" style="width: 30px; height: 30px;">
+                            </a>
 
-                                setTimeout(() => {
-                                    ripples.remove()
-                                }, 1000);
-                            });
-                        });
-                    </script>
+                            <a href="https://www.youtube.com" target="_blank">
+                                <img src="/images/youtube.png" alt="YouTube" style="width: 30px; height: 30px;">
+                            </a>
 
-                    <div style="
-    font-size: 10px;
-    font-weight: bold;
-    color: white;
-    min-width: 300px;
-    padding: 10px;
-    margin: 2vmin;
-    border-radius: 15px;
-    backdrop-filter: blur(60px);
-    box-shadow: 0px 4px 14px 0px rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.1);
-">
+                            <a href="https://www.linkedin.com" target="_blank">
+                                <img src="/images/linkedin.png" alt="LinkedIn" style="width: 30px; height: 30px;">
+                            </a>
 
-                        <div style="display: flex; align-items: center; padding-bottom: 10px">
-                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
-                            <div style="padding: 0 7px; font-weight: bold; font-size: 15px">Nos horaires</div>
-                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                            <a href="https://www.instagram.com" target="_blank">
+                                <img src="/images/instagram.png" alt="Instagram" style="width: 30px; height: 30px;">
+                            </a>
+
                         </div>
 
-                        <!-- Insert the dynamic opening hours here -->
-                        @foreach(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day)
-                            <ul>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span>{{ strtoupper($day) }}</span>
-                                    <span>
-                @if(isset($openDays[$day]))
-                                            {{ $openDays[$day]['open'] }} / {{ $openDays[$day]['break_start'] }} - {{ $openDays[$day]['break_end'] }} / {{ $openDays[$day]['close'] }}
-                                        @else
-                                            Fermé
-                                        @endif
-            </span>
+                        <!-- Logo -->
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <!-- Logo -->
+                            <div style="background: rgba(255, 255, 255, 0.8); margin-top: 4vmin; padding: 15px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center;">
+                                <img src="/images/logo.png" alt="Logo Salon de Coiffure" style="max-width: 160px;">
+                            </div>
+
+                            @if(Auth::check())
+                                <a href="{{ route('appointments.create') }}" class="btn-booking">
+                                    Prendre Rendez-Vous
+                                </a>
+                            @else
+                                <!-- Bouton qui ouvre la modal pour les utilisateurs non connectés -->
+                                <a class="btn-booking" data-toggle="modal" data-target="#loginModal">
+                                    Prendre un rendez-vous
+                                </a>
+                            @endif
+                        </div>
+
+
+                        <!-- Second set of hours -->
+                        <div style="font-size: 10px; font-weight: bold; color: white; min-width: 300px; padding: 10px; margin: 2vmin; border-radius: 15px; backdrop-filter: blur(60px); -webkit-backdrop-filter: blur(60px); box-shadow: 0px 4px 14px 0px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1);">
+
+
+                                <div style="display: flex; align-items: center; padding-bottom: 10px">
+                                    <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                                    <div style="padding: 0 7px; font-weight: bold; font-size: 15px">Nos horaires</div>
+                                    <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
                                 </div>
-                            </ul>
-                        @endforeach
 
-                        <div style="display: flex; align-items: center; padding-top: 10px">
-                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
-                            <div style="padding: 0 7px; font-weight: bold; font-size: 15px">01 23 45 67 89</div>
-                            <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
-                        </div>
+                                <!-- Insert the dynamic opening hours here -->
+                                @foreach(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day)
+                                    <ul>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>{{ strtoupper($day) }}</span>
+                                            <span>
+                                @if(isset($openDays[$day]))
+                                                    {{ $openDays[$day]['open'] }} / {{ $openDays[$day]['break_start'] }} - {{ $openDays[$day]['break_end'] }} / {{ $openDays[$day]['close'] }}
+                                                @else
+                                                    Fermé
+                                                @endif
+                                    </span>
+                                        </div>
+                                    </ul>
+                                @endforeach
+
+                                <div style="display: flex; align-items: center; padding-top: 10px">
+                                    <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                                    <div style="padding: 0 7px; font-weight: bold; font-size: 15px">01 23 45 67 89</div>
+                                    <div style="flex-grow: 1; border-bottom: 3px solid white;"></div>
+                                </div>
+
+                            </div>
 
                     </div>
-
-                    <div>
-                        @include('reviews.index', ['reviews' => $reviews])
-                    </div>
-
 
                 </div>
 
             </div>
+        </div>
+
+        <div class="review" data-aos="fade-down">
+            <section>
+                <div class="mx-auto max-w-screen-lg px-4 lg:px-12">
+                    <div class="mb-4 d-flex justify-content-center">
+                        <div class="col pb-10">
+                            <div>
+                                @include('reviews.index', ['reviews' => $reviews])
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <div class="prestation" data-aos="fade-down">
@@ -390,7 +416,7 @@
         </div>
 
         <div class="portfolio" data-aos="fade-right" data-aos-offset="150">
-            <h2 class=" p-10 text-center font-bold" data-aos="fade-down" style="font-size: 25px; color: white; backdrop-filter: blur(60px); ">Nos réalisations</h2>
+            <h2 class=" p-10 text-center font-bold" data-aos="fade-down" style="font-size: 25px; color: white; backdrop-filter: blur(60px); -webkit-backdrop-filter: blur(60px) ">Nos réalisations</h2>
             <div class="container-fluid tm-container-content" >
                 <div class="row tm-gallery pt-5" style="justify-content: center !important">
                         <div class="swiper">
@@ -430,18 +456,10 @@
                         <div class="col">
                             <div class="row">
                                 <div class="col-md-6" data-aos="fade-right" >
-                                    <div class="card border-0 bg-transparent">
-                                        <div class="card-body">
-                                            <iframe src="https://maps.google.com/maps?q={{$address}}&output=embed" width="100%" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
-                                        </div>
-                                    </div>
+                                                <iframe src="https://maps.google.com/maps?q={{$address}}&output=embed" width="100%" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
                                 </div>
                                 <div class="col-md-6" data-aos="fade-right" >
-                                    <div class="card border-0 bg-transparent">
-                                        <div class="card-body">
-                                            <iframe name="fca9f924a1dc1fe6f" height="450px" data-testid="fb:page Facebook Social Plugin" title="fb:page Facebook Social Plugin" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" src="https://www.facebook.com/v2.10/plugins/page.php?app_id=&amp;container_width=450&amp;height=450&amp;hide_cover=false&amp;hide_cta=false&amp;href=https%3A%2F%2Fwww.facebook.com%2F{{$facebookPageUrl}}&amp;locale=fr_FR&amp;sdk=joey&amp;show_facepile=true&amp;small_header=false&amp;tabs=timeline&amp;width=500px" style="border: none; visibility: visible; width: 450px; height: 450px;" class=""></iframe>
-                                        </div>
-                                    </div>
+                                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F{{$facebookPageUrl}}&amp;locale%3Dfr_FR&tabs=timeline&width=500&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"  data-adapt-container-width="true" width="100%" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                                 </div>
                             </div>
                         </div>
@@ -514,6 +532,26 @@
 
     </div>
 
+
+    <script type="text/javascript">
+        const buttons = document.querySelectorAll('.btn-booking');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+
+                let ripples = document.createElement('span');
+                ripples.classList.add('effect');
+                ripples.style.left = x + 'px';
+                ripples.style.top = y + 'px';
+                this.appendChild(ripples);
+
+                setTimeout(() => {
+                    ripples.remove()
+                }, 1000);
+            });
+        });
+    </script>
 
     <script>
         const swiper = new Swiper('.swiper', {
